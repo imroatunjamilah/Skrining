@@ -72,7 +72,7 @@ di halaman GitHub → Settings → Developer settings.
 | Halaman 404 | Pages belum aktif atau belum selesai build. Cek Settings → Pages, tunggu 2 menit, hard refresh (Ctrl+Shift+R). |
 | CSS/JS tidak termuat | Pastikan `.nojekyll` ikut ter-upload dan semua path memakai path relatif (`css/...`, `js/...`) — di repo ini sudah demikian. |
 | URL salah huruf | URL GitHub Pages peka huruf besar-kecil dan mengikuti nama repo: `/skrining/`. |
-| Login admin gagal | Gunakan `admin` / `skrining2026` (kredensial demo). |
+| Login admin gagal | Gunakan `admin` / `skrining2026` (kredensial demo) — atau kata sandi baru bila petugas sudah menggantinya. Lupa sandi? Hapus data situs di browser untuk kembali ke bawaan. |
 
 ## Peta jalan setelah ini
 

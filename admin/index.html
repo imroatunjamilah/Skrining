@@ -35,12 +35,18 @@
           </div>
           <div class="field" id="field-pass">
             <label for="inp-pass">Password</label>
-            <input class="input" id="inp-pass" type="password" autocomplete="current-password" placeholder="Password">
+            <div class="pw-wrap">
+              <input class="input" id="inp-pass" type="password" autocomplete="current-password" placeholder="Password">
+              <button class="pw-toggle" type="button" data-target="inp-pass" aria-label="Tampilkan sandi" title="Lihat / sembunyikan sandi">
+                <svg class="ic-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                <svg class="ic-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+              </button>
+            </div>
           </div>
           <p class="login-err hidden" id="login-err">Username atau password salah.</p>
           <button class="btn" type="submit">Masuk Dashboard</button>
         </form>
-        <div class="demo-cred">
+        <div class="demo-cred" id="demo-cred-box">
           <b>Kredensial demo:</b> username <code>admin</code> &middot; password <code>skrining2026</code>
           <span>Hanya untuk mode demo. Pada versi produksi, autentikasi dilakukan di server.</span>
         </div>
@@ -228,6 +234,49 @@
           </div>
 
           <p class="card-foot"><b>Batasan mode demo:</b> pengaturan tersimpan di browser perangkat ini. HP peserta lain masih memakai pengaturan bawaan sampai (1) versi backend aktif, atau (2) pengaturan bawaan di <code>js/config.js</code> diperbarui di repo. Setelah backend aktif, pengaturan yang diisi di sini otomatis berlaku untuk semua perangkat.</p>
+        </div>
+
+        <div class="card set-card sandi-card">
+          <h2 class="card-title">Kata Sandi Petugas</h2>
+          <p class="card-desc">Ganti kata sandi untuk login ke dashboard ini. Username tetap <code>admin</code> &mdash; yang bisa diganti hanya kata sandinya. Gunakan ikon <b>mata</b> di kanan kolom untuk melihat sandi yang sedang diketik.</p>
+          <form id="form-sandi" novalidate>
+            <div class="field set-field" id="field-cur-pass">
+              <label for="set-cur-pass">Kata sandi sekarang</label>
+              <div class="pw-wrap">
+                <input class="input" id="set-cur-pass" type="password" autocomplete="current-password" placeholder="Masukkan kata sandi yang dipakai sekarang">
+                <button class="pw-toggle" type="button" data-target="set-cur-pass" aria-label="Tampilkan sandi" title="Lihat / sembunyikan sandi">
+                  <svg class="ic-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                  <svg class="ic-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                </button>
+              </div>
+            </div>
+            <div class="set-grid sandi-grid">
+              <div class="field set-field" id="field-new-pass">
+                <label for="set-new-pass">Kata sandi baru</label>
+                <div class="pw-wrap">
+                  <input class="input" id="set-new-pass" type="password" autocomplete="new-password" placeholder="Minimal 8 karakter">
+                  <button class="pw-toggle" type="button" data-target="set-new-pass" aria-label="Tampilkan sandi" title="Lihat / sembunyikan sandi">
+                    <svg class="ic-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="ic-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
+                </div>
+              </div>
+              <div class="field set-field" id="field-new-pass2">
+                <label for="set-new-pass2">Ulangi kata sandi baru</label>
+                <div class="pw-wrap">
+                  <input class="input" id="set-new-pass2" type="password" autocomplete="new-password" placeholder="Ketik ulang untuk konfirmasi">
+                  <button class="pw-toggle" type="button" data-target="set-new-pass2" aria-label="Tampilkan sandi" title="Lihat / sembunyikan sandi">
+                    <svg class="ic-eye" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+                    <svg class="ic-eye-off" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19m-6.72-1.07a3 3 0 1 1-4.24-4.24"/><line x1="1" y1="1" x2="23" y2="23"/></svg>
+                  </button>
+                </div>
+              </div>
+            </div>
+            <div class="set-actions">
+              <button class="btn" type="submit">Ganti Kata Sandi</button>
+            </div>
+          </form>
+          <p class="card-foot"><b>Mode demo:</b> kata sandi tersimpan di browser perangkat ini (versi produksi: hash bcrypt di server). Simpan kata sandi baru di tempat aman &mdash; jika lupa, hapus data situs dari browser untuk kembali ke sandi bawaan. Setelah sandi diganti, petunjuk kredensial di halaman login otomatis disembunyikan.</p>
         </div>
       </section>
     </main>

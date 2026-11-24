@@ -633,6 +633,39 @@ body[data-page="admin"] #app { display: none; }
 
 .toast.show { opacity: 1; transform: translate(-50%, 0); }
 
+/* ---------- kolom sandi + tombol lihat sandi ---------- */
+
+.pw-wrap { position: relative; }
+
+.pw-wrap .input { padding-right: 52px; }
+
+.pw-toggle {
+  position: absolute;
+  right: 7px;
+  top: 50%;
+  transform: translateY(-50%);
+  width: 38px;
+  height: 38px;
+  border: none;
+  background: transparent;
+  border-radius: 10px;
+  cursor: pointer;
+  color: var(--purple-500);
+  display: grid;
+  place-items: center;
+  transition: background 0.15s ease, color 0.15s ease;
+}
+
+.pw-toggle:hover { background: var(--purple-100); color: var(--purple-700); }
+
+.pw-toggle .ic-eye-off { display: none; }
+.pw-toggle.is-on .ic-eye { display: none; }
+.pw-toggle.is-on .ic-eye-off { display: block; }
+
+.sandi-card { margin-top: 16px; }
+
+.sandi-card .set-grid { margin-top: 0; }
+
 /* ---------- responsif admin ---------- */
 
 @media (max-width: 860px) {

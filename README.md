@@ -25,7 +25,11 @@ melompat, berbicara lewat bubble dialog, memberi semangat, dan berpesta confetti
    ringkasan durasi, dan penjelasan langkah berikutnya — **tanpa skor**.
 
 ### Admin (dashboard demo)
-- Login demo: **`admin` / `skrining2026`** (produksi: autentikasi server, lihat `server/`).
+- Login demo: **`admin` / `skrining2026`** — kata sandi dapat diganti dari dashboard
+  (tab **Pengaturan Acara → Kata Sandi Petugas**); setelah diganti, petunjuk kredensial
+  di halaman login otomatis disembunyikan. Produksi: autentikasi server, lihat `server/`.
+- **Pengaturan Acara**: nama acara, tanggal, lokasi, penyelenggara, kontak, durasi,
+  nama maskot, awalan nomor registrasi — dengan pratinjau langsung halaman peserta.
 - Statistik: total / selesai / belum selesai + grafik distribusi kategori.
 - Tabel peserta: pencarian, filter status & kategori, urutkan, paginasi.
 - Detail peserta: identitas, keluhan, 21 jawaban, hasil D/A/S (mentah, final ×2, kategori).

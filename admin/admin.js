@@ -21,7 +21,8 @@
   const STORE_KEY = "skrining_records_v1";
   const AUTH_KEY = "skrining_admin_session";
   const SETTINGS_KEY = "skrining_event_settings_v1";
-  const LOGIN_DEMO = { username: "admin", password: "skrining2026" };
+  const CRED_KEY = "skrining_admin_cred_v1";
+  const CRED_DEFAULT = { username: "admin", password: "skrining2026" };
 
   const SET_FIELDS = ["namaAcara", "tanggalAcara", "lokasi", "penyelenggara",
     "kontak", "durasiLabel", "namaMaskot", "prefixNomor"];
@@ -87,7 +88,8 @@
       e.preventDefault();
       const u = $("#inp-user").value.trim();
       const p = $("#inp-pass").value;
-      if (u === LOGIN_DEMO.username && p === LOGIN_DEMO.password) {
+      const cred = getCred();
+      if (u === cred.username && p === cred.password) {
         sessionStorage.setItem(AUTH_KEY, "1");
         $("#login-err").classList.add("hidden");
         showView("dash");
@@ -102,6 +104,85 @@
     $("#btn-logout").addEventListener("click", function () {
       sessionStorage.removeItem(AUTH_KEY);
       showView("login");
+    });
+  }
+
+  /* ---------- kredensial & kata sandi petugas ---------- */
+
+  function getCred() {
+    try {
+      const c = JSON.parse(localStorage.getItem(CRED_KEY) || "null");
+      if (c && typeof c === "object" && c.username && c.password) return c;
+    } catch (e) { /* pakai bawaan */ }
+    return Object.assign({}, CRED_DEFAULT);
+  }
+
+  function credAdalahDefault() {
+    const c = getCred();
+    return c.username === CRED_DEFAULT.username && c.password === CRED_DEFAULT.password;
+  }
+
+  function updateLoginHint() {
+    const box = $("#demo-cred-box");
+    if (box) box.classList.toggle("hidden", !credAdalahDefault());
+  }
+
+  function setupPwToggles() {
+    $$(".pw-toggle").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        const inp = document.getElementById(btn.getAttribute("data-target"));
+        if (!inp) return;
+        const show = inp.type === "password";
+        inp.type = show ? "text" : "password";
+        btn.classList.toggle("is-on", show);
+        btn.setAttribute("aria-label", show ? "Sembunyikan sandi" : "Tampilkan sandi");
+        inp.focus();
+      });
+    });
+  }
+
+  function tandaiError(fieldId, inpId) {
+    const f = document.getElementById(fieldId);
+    if (!f) return;
+    f.classList.add("is-error");
+    window.setTimeout(function () { f.classList.remove("is-error"); }, 1200);
+    const inp = document.getElementById(inpId);
+    if (inp) inp.focus();
+  }
+
+  function setupSandi() {
+    $("#form-sandi").addEventListener("submit", function (e) {
+      e.preventDefault();
+      const cred = getCred();
+      const cur = $("#set-cur-pass").value;
+      const baru = $("#set-new-pass").value;
+      const ulang = $("#set-new-pass2").value;
+
+      if (cur !== cred.password) {
+        tandaiError("field-cur-pass", "set-cur-pass");
+        showToast("Kata sandi sekarang salah.");
+        return;
+      }
+      if (baru.length < 8) {
+        tandaiError("field-new-pass", "set-new-pass");
+        showToast("Kata sandi baru minimal 8 karakter.");
+        return;
+      }
+      if (baru === cred.password) {
+        tandaiError("field-new-pass", "set-new-pass");
+        showToast("Kata sandi baru sama dengan yang sekarang.");
+        return;
+      }
+      if (baru !== ulang) {
+        tandaiError("field-new-pass2", "set-new-pass2");
+        showToast("Ulangi kata sandi tidak cocok.");
+        return;
+      }
+
+      localStorage.setItem(CRED_KEY, JSON.stringify({ username: cred.username, password: baru }));
+      $("#form-sandi").reset();
+      updateLoginHint();
+      showToast("Kata sandi berhasil diganti. Login berikutnya memakai sandi baru.");
     });
   }
 
@@ -560,7 +641,10 @@
     setupLogin();
     setupDash();
     setupTabs();
+    setupPwToggles();
+    setupSandi();
     isiFormPengaturan();
+    updateLoginHint();
     showView(sessionStorage.getItem(AUTH_KEY) === "1" ? "dash" : "login");
     renderAll();
   }
