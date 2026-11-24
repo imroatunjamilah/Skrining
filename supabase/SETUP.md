@@ -32,6 +32,12 @@ install apa pun.
 5. Hasil yang benar: muncul pesan sukses, dan di menu **Table Editor**
    ada dua tabel: `peserta` dan `pengaturan`.
 
+> **Sudah pernah membuat tabel sebelumnya** (mis. manual lewat Table
+> Editor, atau dengan skema lama) dan belum yakin strukturnya benar?
+> Jalankan `supabase/perbaikan-tabel.sql` **menggantikan** langkah ini —
+> sekali saja, dan hanya saat belum ada data peserta nyata (file itu
+> menghapus tabel lama lalu membuat ulang dengan izin yang benar).
+
 ## Langkah 3 — Buat akun admin
 
 1. Menu kiri → **Authentication** → tab **Users**.
@@ -45,39 +51,25 @@ install apa pun.
 5. (Opsional, disarankan) Tambahkan email recovery di profil pengguna
    tersebut agar bisa reset sandi sendiri lewat menu "Forgot password".
 
-## Langkah 4 — Ambil dua kunci API
+## Langkah 4 — Ambil dua kunci API — **SELESAI ✓ (dipasang lewat chat)**
 
-1. Menu kiri bawah → **Settings (Project Settings)** → **API**.
-   (Pada tampilan baru: **Project Settings → Data API**.)
-2. Salin dua nilai ini:
-   - **Project URL** — bentuknya `https://xxxxx.supabase.co`
-   - **anon public** (Project API keys → `anon` `public`) — teks panjang
-     diawali `eyJ...`
-3. **PENTING**: kunci yang dipakai HANYA `anon public`. Kunci
-   `service_role` TIDAK PERNAH dipakai di situs dan TIDAK BOLEH
-   dibagikan ke siapa pun.
+Kredensial sudah dikirim oleh pemilik proyek lewat chat dan sudah
+**terpasang di `js/config.js`** (2026-11-25):
 
-## Langkah 5 — Pasang kunci ke situs
+- **Project URL**: `https://aeueglwozlyqcxofanls.supabase.co`
+- **Publishable key (anon public)**: `sb_publishable_2Uk91ijm1QFsdj0Vo6Ehbw_N1Ha1QjP`
+  (format kunci baru Supabase, pengganti kunci lama `eyJ...` — sama-sama
+  aman untuk situs publik)
 
-Dua cara, pilih salah satu:
+> **PENTING**: kunci yang dipakai HANYA publishable/anon public. Kunci
+> `service_role` / `secret` TIDAK PERNAH dipakai di situs dan TIDAK BOLEH
+> dibagikan ke siapa pun.
 
-**Cara A (paling mudah)** — kirim Project URL + kunci anon ke asisten
-(Z.ai) di chat ini, sebut "pasang backend". Kunci akan dimasukkan ke
-`js/config.js` dan dipush ke GitHub. Dalam 2 menit backend aktif.
+## Langkah 5 — Pasang kunci ke situs — **SELESAI ✓**
 
-**Cara B (mandiri)** — edit sendiri:
-1. Buka `js/config.js` di repo GitHub.
-2. Isi baris:
-   ```js
-   supabaseUrl: "https://xxxxx.supabase.co",
-   supabaseAnonKey: "eyJ...",
-   ```
-3. Commit → GitHub Pages rebuild otomatis ±1 menit.
-
-> Kenapa kunci anon aman di situs publik? Karena keamanannya ditangani
-> Row Level Security di database (Langkah 2): peserta hanya bisa
-> MENGIRIM data, tidak bisa membaca/mengubah data siapa pun. Hanya
-> admin yang login bisa melihat data.
+Sudah dilakukan oleh asisten dan di-push ke GitHub. Untuk pembaruan
+mandiri di masa depan: edit `js/config.js` (baris `supabaseUrl` /
+`supabaseAnonKey`) → Commit → GitHub Pages rebuild otomatis ±1 menit.
 
 ## Langkah 6 — Uji end-to-end
 
@@ -92,6 +84,14 @@ Dua cara, pilih salah satu:
    peserta di HP lain → info acara ikut berubah (berlaku global).
 
 ---
+
+## Catatan penting paket gratis Supabase
+
+- Proyek gratis yang **tidak aktif ±7 hari** akan dijeda (Paused) oleh
+  Supabase. **Sehari sebelum acara**, buka dashboard dan pastikan
+  proyek aktif; kalau ada tulisan "Paused", klik **Restore** (±2 menit).
+- Setelah acara: unduh CSV, lalu (jika diinginkan) kosongkan tabel
+  `peserta` dari Table Editor agar data tidak menumpuk.
 
 ## Perilaku sistem setelah backend aktif
 

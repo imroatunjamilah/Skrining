@@ -25,14 +25,15 @@ window.SITE_CONFIG = {
   // Estimasi durasi skrining (tampil di landing page)
   durasiLabel: "± 7 menit",
 
-  // ---------- MODE BACKEND (Supabase) ----------
-  // Isi kedua nilai di bawah setelah proyek Supabase dibuat
-  // (panduan lengkap: supabase/SETUP.md). Biarkan kosong ("")
-  // untuk tetap pada mode demo (localStorage per perangkat).
-  // Yang dipakai HANYA kunci "anon public" — aman untuk situs
-  // publik karena proteksi Row Level Security di database.
-  supabaseUrl: "",
-  supabaseAnonKey: "",
+  // ---------- MODE BACKEND (Supabase) — TERPASANG ✓ ----------
+  // Kredensial proyek Supabase (dipasang 2026-11-25 lewat chat Z.ai).
+  // Yang dipakai HANYA kunci "publishable" (anon public) — memang
+  // dirancang untuk tampil di situs publik; keamanan data dijaga
+  // Row Level Security di database (lihat supabase/schema.sql).
+  // JANGAN pernah menaruh kunci service_role di file ini.
+  // Kosongkan kedua nilai untuk kembali ke mode demo (localStorage).
+  supabaseUrl: "https://aeueglwozlyqcxofanls.supabase.co",
+  supabaseAnonKey: "sb_publishable_2Uk91ijm1QFsdj0Vo6Ehbw_N1Ha1QjP",
 };
 
 /* ------------------------------------------------------------

@@ -112,7 +112,15 @@
           showView("dash");
           renderAll();
         } else {
-          $("#login-err").textContent = res.error || "Email atau sandi salah.";
+          // bedakan "sandi salah" dengan "setup backend belum selesai"
+          let pesan = res.error || "Email atau sandi salah.";
+          try {
+            const siap = await DB.cekSiap();
+            if (!siap.ok) {
+              pesan = "Database belum siap: jalankan skema SQL (supabase/schema.sql) dan buat akun admin di Supabase — lihat panduan supabase/SETUP.md.";
+            }
+          } catch (err) { /* pakai pesan bawaan */ }
+          $("#login-err").textContent = pesan;
           $("#login-err").classList.remove("hidden");
           $("#field-pass").classList.add("is-error");
           window.setTimeout(function () { $("#field-pass").classList.remove("is-error"); }, 500);

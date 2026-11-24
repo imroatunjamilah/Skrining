@@ -5,8 +5,9 @@
    (admin.js). Mode ditentukan dari js/config.js:
    - supabaseUrl + supabaseAnonKey terisi → mode BACKEND
    - salah satu kosong → mode DEMO (localStorage)
-   Di mode backend, jawaban peserta divalidasi ulang oleh
-   DATABASE (lihat supabase/schema.sql), bukan oleh browser.
+   Di mode backend, data peserta disimpan lewat fungsi database
+   daftar_peserta() yang memvalidasi ulang jawaban (21 butir,
+   nilai 0-3) dan menentukan nomor registrasi di server.
    ============================================================ */
 
 (function () {
@@ -30,21 +31,6 @@
   }
 
   /* ---------- util ---------- */
-
-  function acak3() {
-    return String(1 + Math.floor(Math.random() * 999)).padStart(3, "0");
-  }
-
-  function tanggalKode() {
-    const d = new Date();
-    const p = function (n) { return (n < 10 ? "0" : "") + n; };
-    return "" + d.getFullYear() + p(d.getMonth() + 1) + p(d.getDate());
-  }
-
-  function nomorBaru() {
-    const prefix = CFG.prefixNomor || "SKR";
-    return prefix + "-" + tanggalKode() + "-" + acak3();
-  }
 
   function keArrayJawaban(j) {
     if (Array.isArray(j)) return j;
@@ -76,7 +62,6 @@
 
   function pesanError(e) {
     if (!e) return "Terjadi kesalahan tak terduga.";
-    if (e.code === "23505") return "Nomor registrasi bentrok, silakan ulangi.";
     if (/Failed to fetch|NetworkError/i.test(e.message || "")) {
       return "Tidak bisa terhubung ke server. Periksa internet, lalu coba lagi.";
     }
@@ -130,41 +115,45 @@
       }
     },
 
+    /* --- pengecekan kesiapan backend (tabel sudah dibuat?) --- */
+
+    async cekSiap() {
+      if (!aktif) return { ok: false, error: "Mode demo aktif." };
+      try {
+        const { error } = await client.from("pengaturan").select("kunci").limit(1);
+        if (error) throw error;
+        return { ok: true };
+      } catch (e) {
+        return { ok: false, error: pesanError(e) };
+      }
+    },
+
     /* --- peserta --- */
 
     async simpanPeserta(rec) {
       if (!aktif) return { ok: true };
-      const payload = {
-        nama: rec.nama,
-        alamat: rec.alamat || null,
-        no_hp: rec.noHp || null,
-        kategori: rec.kategori,
-        nim: rec.nim || null,
-        nip: rec.nip || null,
-        keluhan: rec.keluhan || null,
-        jawaban: rec.jawaban,
-        durasi_detik: rec.durasiDetik || null,
-        perangkat: (navigator.userAgent || "").slice(0, 380),
-      };
 
-      // nomor registrasi dibuat di sini (acak) + ulang bila bentrok
-      let terakhir = null;
-      for (let i = 0; i < 6; i++) {
-        try {
-          const { data, error } = await client
-            .from("peserta")
-            .insert(Object.assign({ nomor_registrasi: nomorBaru() }, payload))
-            .select("nomor_registrasi")
-            .single();
-          if (error) throw error;
-          return { ok: true, nomorRegistrasi: data.nomor_registrasi };
-        } catch (e) {
-          terakhir = e;
-          if (e && e.code === "23505") continue; // bentrok nomor → coba lagi
-          break;
-        }
+      // Penyimpanan lewat fungsi daftar_peserta() di database:
+      // validasi ulang di server + nomor registrasi ditentukan server
+      // (anti bentrok antar HP, tidak bisa dimanipulasi dari browser).
+      try {
+        const { data, error } = await client.rpc("daftar_peserta", {
+          p_nama: rec.nama,
+          p_alamat: rec.alamat || null,
+          p_no_hp: rec.noHp || null,
+          p_kategori: rec.kategori,
+          p_nim: rec.nim || null,
+          p_nip: rec.nip || null,
+          p_keluhan: rec.keluhan || null,
+          p_jawaban: rec.jawaban,
+          p_durasi_detik: rec.durasiDetik || null,
+          p_perangkat: (navigator.userAgent || "").slice(0, 380),
+        });
+        if (error) throw error;
+        return { ok: true, nomorRegistrasi: data };
+      } catch (e) {
+        return { ok: false, error: pesanError(e) };
       }
-      return { ok: false, error: pesanError(terakhir) };
     },
 
     async muatSemuaPeserta() {
