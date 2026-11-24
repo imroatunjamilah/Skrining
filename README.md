@@ -38,6 +38,15 @@ melompat, berbicara lewat bubble dialog, memberi semangat, dan berpesta confetti
 - Data demo sekali klik; tombol PDF tampil nonaktif (butuh backend) supaya jujur terhadap
   kemampuan versi statis.
 
+### Backend (Supabase) — data terkumpul dari semua perangkat
+- Situs mendukung **dua mode**: demo (localStorage, default) dan **backend** (Supabase
+  Postgres + Auth). Mode ditentukan oleh `supabaseUrl` + `supabaseAnonKey` di `js/config.js`.
+- Setelah backend aktif: data peserta dari semua HP masuk ke satu database; admin login
+  dengan email sungguhan (Supabase Auth); pengaturan acara berlaku global; validasi
+  jawaban dijalankan **database** (Row Level Security + check constraint).
+- Skor di dashboard **selalu dihitung ulang** dari jawaban mentah — bukan dipercaya dari klien.
+- Panduan pemasangan lengkap ±15 menit: `supabase/SETUP.md` (skema: `supabase/schema.sql`).
+
 ### Maskot Lumi (mesin animasi)
 - Idle: bernapas, berkedip, mengapung, daun bergoyang, **mata mengikuti kursor**.
 - **Wave**: melambai mengajak main di landing, lewat rotasi lengan SVG.

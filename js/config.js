@@ -24,6 +24,15 @@ window.SITE_CONFIG = {
 
   // Estimasi durasi skrining (tampil di landing page)
   durasiLabel: "± 7 menit",
+
+  // ---------- MODE BACKEND (Supabase) ----------
+  // Isi kedua nilai di bawah setelah proyek Supabase dibuat
+  // (panduan lengkap: supabase/SETUP.md). Biarkan kosong ("")
+  // untuk tetap pada mode demo (localStorage per perangkat).
+  // Yang dipakai HANYA kunci "anon public" — aman untuk situs
+  // publik karena proteksi Row Level Security di database.
+  supabaseUrl: "",
+  supabaseAnonKey: "",
 };
 
 /* ------------------------------------------------------------

@@ -71,6 +71,11 @@
   }
 
   function genRegNumber() {
+    // Mode backend: nomor final ditentukan server (anti bentrok antar HP);
+    // di sini cukup nomor awal acak sebagai penanda sementara.
+    if (window.DB && window.DB.backend) {
+      return CFG.prefixNomor + "-" + tanggalKode() + "-" + String(1 + Math.floor(Math.random() * 999)).padStart(3, "0");
+    }
     const hariIni = tanggalKode();
     const recs = getRecords().filter(function (r) {
       return r.regNumber && r.regNumber.indexOf(CFG.prefixNomor + "-" + hariIni) === 0;
@@ -598,6 +603,24 @@
     }
     saveDraft(null);
 
+    // KIRIM KE SERVER (mode backend) — terjadi di belakang layar;
+    // kalau internet gagal, data tetap aman di localStorage peserta.
+    if (window.DB && window.DB.backend && rec) {
+      window.DB.simpanPeserta(rec).then(function (res) {
+        if (res && res.ok && res.nomorRegistrasi && res.nomorRegistrasi !== rec.regNumber) {
+          // server memberi nomor final (anti bentrok) → perbarui layar & backup lokal
+          rec.regNumber = res.nomorRegistrasi;
+          saveRecords(recs);
+          const el = $("#reg-number");
+          if (el) el.textContent = res.nomorRegistrasi;
+        } else if (res && !res.ok) {
+          console.warn("Pengiriman ke server gagal:", res.error);
+        }
+      }).catch(function (e) {
+        console.warn("Pengiriman ke server gagal:", e);
+      });
+    }
+
     // isi layar selesai
     const namaDepan = state.identity.nama ? state.identity.nama.split(" ")[0] : "Teman";
     $("#done-sub").textContent =
@@ -678,6 +701,11 @@
 
   function init() {
     isiConfigKeHalaman();
+
+    // Mode backend: pengaturan acara diambil dari database (berlaku global),
+    // lalu halaman di-render ulang saat event "pengaturan:berubah".
+    window.addEventListener("pengaturan:berubah", isiConfigKeHalaman);
+    if (window.DB && window.DB.backend) window.DB.muatPengaturan();
 
     hero = FX.createMascot($("#mascot-hero-slot"), { variant: "hero" });
     companion = FX.createMascot($("#mascot-companion-slot"), { variant: "companion" });

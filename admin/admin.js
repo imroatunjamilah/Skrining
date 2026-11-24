@@ -17,6 +17,7 @@
   const CFG = window.SITE_CONFIG;
   const Q = window.DASS21;
   const Scoring = window.DASS21Scoring;
+  const DB = window.DB;
 
   const STORE_KEY = "skrining_records_v1";
   const AUTH_KEY = "skrining_admin_session";
@@ -81,13 +82,44 @@
   }
 
   function setupLogin() {
-    const sudahLogin = sessionStorage.getItem(AUTH_KEY) === "1";
-    if (sudahLogin) { showView("dash"); renderAll(); }
+    // Mode backend: kolom username berubah menjadi email admin (Supabase Auth)
+    if (DB.backend) {
+      const lbl = document.querySelector('label[for="inp-user"]');
+      if (lbl) lbl.textContent = "Email admin";
+      $("#inp-user").setAttribute("type", "email");
+      $("#inp-user").setAttribute("placeholder", "email@contoh.com");
+      $("#inp-user").setAttribute("autocomplete", "email");
+    }
 
-    $("#form-login").addEventListener("submit", function (e) {
+    const sudahLogin = sessionStorage.getItem(AUTH_KEY) === "1";
+    // mode backend: keputusan tampilan ditentukan init() lewat pengecekan
+    // sesi sungguhan ke server (bukan sessionStorage perangkat)
+    if (sudahLogin && !DB.backend) { showView("dash"); renderAll(); }
+
+    $("#form-login").addEventListener("submit", async function (e) {
       e.preventDefault();
       const u = $("#inp-user").value.trim();
       const p = $("#inp-pass").value;
+
+      if (DB.backend) {
+        const btn = e.target.querySelector("button[type=submit], button.btn");
+        if (btn) { btn.disabled = true; btn.textContent = "Memeriksa..."; }
+        const res = await DB.login(u, p);
+        if (btn) { btn.disabled = false; btn.textContent = "Masuk Dashboard"; }
+        if (res.ok) {
+          sessionStorage.setItem(AUTH_KEY, "1");
+          $("#login-err").classList.add("hidden");
+          showView("dash");
+          renderAll();
+        } else {
+          $("#login-err").textContent = res.error || "Email atau sandi salah.";
+          $("#login-err").classList.remove("hidden");
+          $("#field-pass").classList.add("is-error");
+          window.setTimeout(function () { $("#field-pass").classList.remove("is-error"); }, 500);
+        }
+        return;
+      }
+
       const cred = getCred();
       if (u === cred.username && p === cred.password) {
         sessionStorage.setItem(AUTH_KEY, "1");
@@ -101,8 +133,9 @@
       }
     });
 
-    $("#btn-logout").addEventListener("click", function () {
+    $("#btn-logout").addEventListener("click", async function () {
       sessionStorage.removeItem(AUTH_KEY);
+      if (DB.backend) await DB.logout();
       showView("login");
     });
   }
@@ -124,7 +157,7 @@
 
   function updateLoginHint() {
     const box = $("#demo-cred-box");
-    if (box) box.classList.toggle("hidden", !credAdalahDefault());
+    if (box) box.classList.toggle("hidden", DB.backend ? true : !credAdalahDefault());
   }
 
   function setupPwToggles() {
@@ -151,31 +184,47 @@
   }
 
   function setupSandi() {
-    $("#form-sandi").addEventListener("submit", function (e) {
+    $("#form-sandi").addEventListener("submit", async function (e) {
       e.preventDefault();
       const cred = getCred();
       const cur = $("#set-cur-pass").value;
       const baru = $("#set-new-pass").value;
       const ulang = $("#set-new-pass2").value;
 
-      if (cur !== cred.password) {
-        tandaiError("field-cur-pass", "set-cur-pass");
-        showToast("Kata sandi sekarang salah.");
-        return;
-      }
       if (baru.length < 8) {
         tandaiError("field-new-pass", "set-new-pass");
         showToast("Kata sandi baru minimal 8 karakter.");
         return;
       }
-      if (baru === cred.password) {
-        tandaiError("field-new-pass", "set-new-pass");
-        showToast("Kata sandi baru sama dengan yang sekarang.");
-        return;
-      }
       if (baru !== ulang) {
         tandaiError("field-new-pass2", "set-new-pass2");
         showToast("Ulangi kata sandi tidak cocok.");
+        return;
+      }
+
+      if (DB.backend) {
+        const res = await DB.gantiSandi(cur, baru);
+        if (res.ok) {
+          $("#form-sandi").reset();
+          showToast("Kata sandi admin berhasil diganti di server.");
+        } else {
+          if (/sandi sekarang salah/i.test(res.error || "")) {
+            tandaiError("field-cur-pass", "set-cur-pass");
+          }
+          showToast(res.error || "Gagal mengganti sandi.");
+        }
+        return;
+      }
+
+      // mode demo
+      if (cur !== cred.password) {
+        tandaiError("field-cur-pass", "set-cur-pass");
+        showToast("Kata sandi sekarang salah.");
+        return;
+      }
+      if (baru === cred.password) {
+        tandaiError("field-new-pass", "set-new-pass");
+        showToast("Kata sandi baru sama dengan yang sekarang.");
         return;
       }
 
@@ -194,7 +243,8 @@
   }
 
   function isiFormPengaturan() {
-    const saved = bacaPengaturan();
+    // mode backend: nilai terbaik ada di CFG (hasil muat dari server)
+    const saved = DB.backend ? {} : bacaPengaturan();
     SET_FIELDS.forEach(function (k) {
       const inp = document.getElementById("set-" + k);
       if (!inp) return;
@@ -229,13 +279,26 @@
     data.prefixNomor = data.prefixNomor.toUpperCase().replace(/[^A-Z0-9]/g, "");
     document.getElementById("set-prefixNomor").value = data.prefixNomor;
 
+    simpanPengaturanInti(data);
+  }
+
+  async function simpanPengaturanInti(data) {
     const def = window.SITE_CONFIG_DEFAULT || {};
     localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
     SET_FIELDS.forEach(function (k) {
       CFG[k] = data[k] !== "" ? data[k] : (def[k] || "");
     });
+
+    // mode backend: simpan juga ke database agar berlaku di SEMUA perangkat
+    if (DB.backend) {
+      const res = await DB.simpanPengaturan(data);
+      showToast(res.ok
+        ? "Pengaturan tersimpan di server — berlaku untuk semua perangkat."
+        : "Tersimpan lokal, tapi gagal ke server: " + (res.error || "?") + "");
+    } else {
+      showToast("Pengaturan tersimpan. Halaman peserta di perangkat ini sudah memakainya.");
+    }
     $("#dash-sub").textContent = "Panel petugas — " + CFG.namaAcara;
-    showToast("Pengaturan tersimpan. Halaman peserta di perangkat ini sudah memakainya.");
   }
 
   function resetPengaturan() {
@@ -600,7 +663,7 @@
     $("#pg-prev").addEventListener("click", function () { page -= 1; renderTable(); });
     $("#pg-next").addEventListener("click", function () { page += 1; renderTable(); });
 
-    $("#tbl-body").addEventListener("click", function (e) {
+    $("#tbl-body").addEventListener("click", async function (e) {
       const btn = e.target.closest("button[data-act]");
       if (!btn || btn.disabled) return;
       const act = btn.getAttribute("data-act");
@@ -609,7 +672,14 @@
       if (act === "hapus") {
         const r = records.filter(function (x) { return x.id === id; })[0];
         if (r && window.confirm("Hapus data peserta \"" + (r.nama || id) + "\"?")) {
-          setRecords(records.filter(function (x) { return x.id !== id; }));
+          if (DB.backend) {
+            const res = await DB.hapusPeserta(id);
+            if (!res.ok) { showToast("Gagal hapus: " + res.error); return; }
+            showToast("Data peserta dihapus dari server.");
+            renderAll();
+          } else {
+            setRecords(records.filter(function (x) { return x.id !== id; }));
+          }
         }
       }
     });
@@ -622,29 +692,65 @@
 
     $("#btn-export-csv").addEventListener("click", eksporCSV);
     $("#btn-seed").addEventListener("click", function () {
+      if (DB.backend) { showToast("Data demo hanya untuk mode demo — saat ini terhubung database."); return; }
       seedDemo();
     });
     $("#btn-clear").addEventListener("click", function () {
+      if (DB.backend) { showToast("Pada mode backend, hapus data lewat tombol Hapus per peserta."); return; }
       if (window.confirm("Hapus SEMUA data peserta di perangkat ini?")) setRecords([]);
     });
 
     $("#dash-sub").textContent = "Panel petugas — " + CFG.namaAcara;
+
+    // penanda mode pada banner atas dashboard
+    const banner = document.querySelector(".demo-banner");
+    if (banner) {
+      banner.textContent = DB.backend
+        ? "MODE DATABASE — data peserta terkumpul dari semua perangkat (Supabase)."
+        : "MODE DEMO — data disimpan di localStorage perangkat ini. Versi produksi terhubung ke database (lihat /supabase/SETUP.md).";
+    }
   }
 
-  function renderAll() {
-    records = getRecords();
+  async function renderAll() {
+    if (DB.backend) {
+      try {
+        records = await DB.muatSemuaPeserta();
+      } catch (e) {
+        records = [];
+        showToast("Gagal memuat data: " + (e.message || e));
+      }
+    } else {
+      records = getRecords();
+    }
     renderStats();
     renderTable();
   }
 
-  function init() {
+  async function init() {
     setupLogin();
     setupDash();
     setupTabs();
     setupPwToggles();
     setupSandi();
-    isiFormPengaturan();
     updateLoginHint();
+
+    if (DB.backend) {
+      // cek sesi login yang masih berlaku (supabase menyimpannya otomatis)
+      const u = await DB.user();
+      if (u) {
+        sessionStorage.setItem(AUTH_KEY, "1");
+        showView("dash");
+        await DB.muatPengaturan();
+        isiFormPengaturan();
+        $("#dash-sub").textContent = "Panel petugas — " + CFG.namaAcara;
+        renderAll();
+        return;
+      }
+      showView("login");
+      return;
+    }
+
+    isiFormPengaturan();
     showView(sessionStorage.getItem(AUTH_KEY) === "1" ? "dash" : "login");
     renderAll();
   }
