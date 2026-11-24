@@ -1,21 +1,33 @@
 /* ============================================================
    MODUL SKORING DASS-21
    ------------------------------------------------------------
+   SUMBER RESMI (dokumen referensi penyelenggara, telah diterima
+   dan diverifikasi kata-per-kata):
+   • "DASS 21 Versi Indonesia UPA BK.pdf", halaman 3
+     (SCORING DASS 21) — seluruh konstanta di bawah disalin
+     PERSIS dari dokumen tersebut:
+        1) Depresi   : total jawaban butir 3,5,10,13,16,17,21
+                        dikali 2
+        2) Kecemasan : total jawaban butir 2,4,7,9,15,19,20
+                        dikali 2
+        3) Stress    : total jawaban butir 1,6,8,11,12,14,18
+                        dikali 2
+     Tabel ambang (skor final, halaman 3 dokumen):
+        Rating        Depresi   Kecemasan   Stress
+        Normal        0-9       0-7         0-14
+        Ringan        10-13     8-9         15-18
+        Sedang        14-20     10-14       19-25
+        Berat         21-27     15-19       26-33
+        Sangat Berat  28+       20+         34+
+   ------------------------------------------------------------
    PENTING — BACA SEBELUM MENGUBAH:
    1. Seluruh konstanta skoring dipusatkan di file ini agar mudah
       diaudit dan diganti. Tidak ada angka skoring yang tersebar
       di file lain.
-   2. Versi saat ini menggunakan metode standar publikasi resmi
-      DASS (Lovibond & Lovibond, 1995):
-        - Skor mentah  = jumlah jawaban 7 butir per subskala
-        - Skor final   = skor mentah x 2 (setara DASS-42)
-        - Kategori     = ambang severity tabel resmi DASS
-   3. Sesuai kesepakatan dengan penyelenggara: selama dokumen
-      referensi resmi belum diterima, modul ini memakai ambang
-      standar di atas. JIKA dokumen referensi berbeda, cukup
-      ganti konstanta SUBSKALA_ITEMS, MULTIPLIER, dan AMBANG
-      di bawah — logika perhitungan tidak perlu disentuh.
-   4. Catatan produksi: pada versi final dengan backend, fungsi
+   2. Konstanta di bawah TIDAK BOLEH diubah dari nilai dokumen
+      referensi tanpa persetujuan penyelenggara — nomor butir,
+      pengali x2, dan ambang di atas adalah kaidah resmi.
+   3. Catatan produksi: pada versi final dengan backend, fungsi
       hitung() HARUS dijalankan ulang di server (source of
       truth) — skor dari klien tidak boleh dipercaya mentah-
       mentah. Lihat /server/README.md.
@@ -60,10 +72,11 @@ window.DASS21Scoring = (function () {
     ],
   };
 
+  // Label persis dokumen referensi (tabel "SCORING DASS 21")
   const SUBSKALA_LABEL = {
     depresi: "Depresi",
-    ansietas: "Ansietas",
-    stres: "Stres",
+    ansietas: "Kecemasan",
+    stres: "Stress",
   };
 
   function kategoriDariSkor(subskala, skorFinal) {

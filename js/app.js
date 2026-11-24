@@ -499,7 +499,11 @@
       btn.setAttribute("role", "radio");
       btn.setAttribute("aria-checked", state.answers[i] === opsi.nilai ? "true" : "false");
       if (state.answers[i] === opsi.nilai) btn.classList.add("is-selected");
-      btn.innerHTML = '<span class="opt-val">' + opsi.nilai + "</span><span>" + opsi.label + "</span>";
+      btn.innerHTML =
+        '<span class="opt-val">' + opsi.nilai + "</span>" +
+        '<span class="opt-txt"><span class="opt-label">' + opsi.label + "</span>" +
+        (opsi.deskripsi ? '<span class="opt-desc">' + opsi.deskripsi + "</span>" : "") +
+        "</span>";
       btn.addEventListener("click", function () { pilihJawaban(opsi.nilai, btn); });
       wrap.appendChild(btn);
     });

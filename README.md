@@ -17,8 +17,9 @@ melompat, berbicara lewat bubble dialog, memberi semangat, dan berpesta confetti
    dinamis NIM/NIP + validasi lengkap di sisi klien.
 3. **Cerita** — keluhan bebas ("Apa yang sedang kamu rasakan akhir-akhir ini?") dengan
    6 chip ide awal; boleh dilewati.
-4. **Kuis DASS-21** — 21 butir resmi satu-per-layar, skala 0–3 (Tidak pernah → Hampir
-   selalu, kerangka waktu "minggu lalu"), wajib dijawab semua, tombol Kembali/Lanjut,
+4. **Kuis DASS-21** — 21 butir resmi satu-per-layar, skala 0–3 sesuai dokumen referensi
+   (Tidak Terjadi → Jarang Terjadi → Sering Terjadi → Selalu Terjadi, kerangka waktu
+   "satu minggu belakangan ini"), wajib dijawab semua, tombol Kembali/Lanjut,
    progres `n/21`, transisi antar-bab dengan splash + confetti, dan reaksi maskot.
 5. **Selesai** — perayaan, **nomor registrasi unik** (contoh `SKR-20261124-001`),
    ringkasan durasi, dan penjelasan langkah berikutnya — **tanpa skor**.
@@ -42,16 +43,20 @@ melompat, berbicara lewat bubble dialog, memberi semangat, dan berpesta confetti
 - Confetti: kembang api halaman penuh saat menyelesaikan skrining.
 - Hormat pada `prefers-reduced-motion` (animasi dimatikan bila pengguna memintanya).
 
-### Skoring DASS-21
-- 21 butir resmi (teks Inggris terverifikasi dari formulir resmi UNSW + terjemahan
-  Indonesia setia) dengan pemetaan subskala resmi:
-  Depresi 3,5,10,13,16,17,21 · Ansietas 2,4,7,9,15,19,20 · Stres 1,6,8,11,12,14,18.
-- Metode standar publikasi (Lovibond & Lovibond, 1995): skor mentah per subskala →
-  **×2** → kategori severity tabel resmi.
-- **Seluruh konstanta dipusatkan di `js/scoring.js`** dan di-comment jelas, sehingga
-  mudah disesuaikan **dengan dokumen referensi resmi penyelenggara** begitu diterima
-  (tanpa menyentuh logika lain). Pada versi produksi, perhitungan wajib dijalankan
-  ulang di server — blueprint tersedia.
+### Skoring DASS-21 (dokumen referensi resmi — TERVERIFIKASI)
+- Sumber: **"DASS 21 Versi Indonesia UPA BK.pdf"** (dokumen referensi penyelenggara,
+  telah diterima). Seluruh 21 pernyataan di `js/questions.js` disalin **verbatim**
+  dari halaman 1–2 dokumen, beserta 4 pilihan jawaban resminya.
+- Skoring (halaman 3 dokumen, disalin persis ke `js/scoring.js`):
+  - **Depresi** = jumlah jawaban butir 3, 5, 10, 13, 16, 17, 21 → **×2**
+  - **Kecemasan** = jumlah jawaban butir 2, 4, 7, 9, 15, 19, 20 → **×2**
+  - **Stress** = jumlah jawaban butir 1, 6, 8, 11, 12, 14, 18 → **×2**
+  - Ambang severity (skor final): Depresi Normal 0–9 / Ringan 10–13 / Sedang 14–20 /
+    Berat 21–27 / Sangat Berat 28+ · Kecemasan 0–7 / 8–9 / 10–14 / 15–19 / 20+ ·
+    Stress 0–14 / 15–18 / 19–25 / 26–33 / 34+.
+- **Seluruh konstanta dipusatkan di `js/scoring.js`** dan dikomentari jelas untuk
+  audit. Pada versi produksi, perhitungan wajib dijalankan ulang di server
+  (anti-manipulasi) — blueprint tersedia di `server/`.
 
 ## Menjalankan lokal
 
@@ -81,8 +86,8 @@ skrining/
 │   └── mascot.css          # maskot, bubble, confetti
 ├── js/
 │   ├── config.js           # konfigurasi acara (nama, penyelenggara, prefix nomor, nama maskot)
-│   ├── questions.js        # 21 butir resmi DASS-21 (EN + ID, pemetaan subskala)
-│   ├── scoring.js          # modul skoring terpusat (menunggu dokumen referensi)
+│   ├── questions.js        # 21 butir resmi DASS-21 versi Indonesia UPA BK (verbatim)
+│   ├── scoring.js          # modul skoring terpusat (persis dokumen referensi)
 │   ├── mascot.js           # mesin animasi maskot + confetti
 │   └── app.js              # controller alur peserta (titik integrasi backend)
 ├── assets/favicon.svg

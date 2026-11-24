@@ -402,6 +402,22 @@
   transition: all 0.18s ease;
 }
 
+.opt .opt-txt {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.opt .opt-label { font-weight: 700; }
+
+.opt .opt-desc {
+  font-weight: 500;
+  font-size: 0.78rem;
+  line-height: 1.35;
+  color: var(--ink-soft);
+}
+
 .opt:hover:not(:disabled) { transform: translateX(5px); border-color: var(--purple-400); background: #fff; }
 .opt:active:not(:disabled) { transform: scale(0.97); }
 

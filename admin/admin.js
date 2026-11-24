@@ -238,7 +238,7 @@
       ? '<div class="keluhan-quote">' + escapeHtml(r.keluhan) + "</div>"
       : '<div class="keluhan-quote" style="opacity:.6">Tidak menulis cerita.</div>';
 
-    html += '<p class="sec-label">Jawaban DASS-21 (0=Tidak pernah &middot; 1=Kadang-kadang &middot; 2=Sering &middot; 3=Hampir selalu)</p>';
+    html += '<p class="sec-label">Jawaban DASS-21 (0=Tidak Terjadi &middot; 1=Jarang Terjadi &middot; 2=Sering Terjadi &middot; 3=Selalu Terjadi)</p>';
     html += '<div class="jawaban-list">';
     const jaw = r.jawaban || new Array(21).fill(null);
     Q.butir.forEach(function (b) {
@@ -302,7 +302,7 @@
       "Keluhan",
     ];
     for (let i = 1; i <= 21; i++) head.push("Jawaban " + i);
-    ["Depresi", "Ansietas", "Stres"].forEach(function (s) {
+    ["Depresi", "Kecemasan", "Stress"].forEach(function (s) {
       head.push(s + " Mentah", s + " Final", s + " Kategori");
     });
     // Ruang analisis keluhan (LLM) — terisi otomatis saat backend aktif
