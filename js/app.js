@@ -666,11 +666,12 @@
   /* ---------- inisialisasi ---------- */
 
   function isiConfigKeHalaman() {
+    const lokasi = CFG.lokasi || "";
     $("#brand-name").textContent = CFG.namaAcara;
-    $("#event-chip").textContent = CFG.tanggalAcara;
+    $("#event-chip").textContent = CFG.tanggalAcara + (lokasi ? " · " + lokasi : "");
     $("#mascot-name-sub").textContent = CFG.namaMaskot;
     $("#info-duration").textContent = CFG.durasiLabel;
-    $("#footer-organizer").textContent = CFG.penyelenggara;
+    $("#footer-organizer").textContent = CFG.penyelenggara + (lokasi ? " — " + lokasi : "");
     $("#footer-kontak").textContent = CFG.kontak;
     document.title = CFG.namaAcara + " — Ayo Main Bareng " + CFG.namaMaskot + "!";
   }

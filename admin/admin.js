@@ -20,7 +20,11 @@
 
   const STORE_KEY = "skrining_records_v1";
   const AUTH_KEY = "skrining_admin_session";
+  const SETTINGS_KEY = "skrining_event_settings_v1";
   const LOGIN_DEMO = { username: "admin", password: "skrining2026" };
+
+  const SET_FIELDS = ["namaAcara", "tanggalAcara", "lokasi", "penyelenggara",
+    "kontak", "durasiLabel", "namaMaskot", "prefixNomor"];
 
   const PAGE_SIZE = 8;
 
@@ -57,6 +61,19 @@
 
   /* ---------- login (demo) ---------- */
 
+  function showToast(msg) {
+    let t = document.querySelector(".toast");
+    if (!t) {
+      t = document.createElement("div");
+      t.className = "toast";
+      document.body.appendChild(t);
+    }
+    t.textContent = msg;
+    t.classList.add("show");
+    window.clearTimeout(t._timer);
+    t._timer = window.setTimeout(function () { t.classList.remove("show"); }, 2600);
+  }
+
   function showView(name) {
     $("#view-login").classList.toggle("hidden", name !== "login");
     $("#view-dash").classList.toggle("hidden", name !== "dash");
@@ -86,6 +103,90 @@
       sessionStorage.removeItem(AUTH_KEY);
       showView("login");
     });
+  }
+
+  /* ---------- pengaturan acara ---------- */
+
+  function bacaPengaturan() {
+    try { return JSON.parse(localStorage.getItem(SETTINGS_KEY) || "null") || {}; }
+    catch (e) { return {}; }
+  }
+
+  function isiFormPengaturan() {
+    const saved = bacaPengaturan();
+    SET_FIELDS.forEach(function (k) {
+      const inp = document.getElementById("set-" + k);
+      if (!inp) return;
+      inp.value = (typeof saved[k] === "string") ? saved[k] : (CFG[k] || "");
+    });
+    updatePreview();
+  }
+
+  function updatePreview() {
+    const nama = (document.getElementById("set-namaAcara") || {}).value || CFG.namaAcara;
+    const tgl = (document.getElementById("set-tanggalAcara") || {}).value || CFG.tanggalAcara;
+    const lok = (document.getElementById("set-lokasi") || {}).value || CFG.lokasi || "";
+    const org = (document.getElementById("set-penyelenggara") || {}).value || CFG.penyelenggara;
+    $("#pv-nama").textContent = nama;
+    $("#pv-chip").textContent = tgl + (lok ? " · " + lok : "");
+    $("#pv-foot").textContent = org + (lok ? " — " + lok : "");
+  }
+
+  function simpanPengaturan() {
+    const data = {};
+    SET_FIELDS.forEach(function (k) {
+      const inp = document.getElementById("set-" + k);
+      data[k] = inp ? inp.value.trim() : "";
+    });
+
+    if (!data.namaAcara) {
+      showToast("Nama acara tidak boleh kosong.");
+      document.getElementById("set-namaAcara").focus();
+      return;
+    }
+    if (!data.prefixNomor) data.prefixNomor = "SKR";
+    data.prefixNomor = data.prefixNomor.toUpperCase().replace(/[^A-Z0-9]/g, "");
+    document.getElementById("set-prefixNomor").value = data.prefixNomor;
+
+    const def = window.SITE_CONFIG_DEFAULT || {};
+    localStorage.setItem(SETTINGS_KEY, JSON.stringify(data));
+    SET_FIELDS.forEach(function (k) {
+      CFG[k] = data[k] !== "" ? data[k] : (def[k] || "");
+    });
+    $("#dash-sub").textContent = "Panel petugas — " + CFG.namaAcara;
+    showToast("Pengaturan tersimpan. Halaman peserta di perangkat ini sudah memakainya.");
+  }
+
+  function resetPengaturan() {
+    if (!window.confirm("Kembalikan semua pengaturan ke bawaan situs?")) return;
+    localStorage.removeItem(SETTINGS_KEY);
+    const def = window.SITE_CONFIG_DEFAULT || {};
+    SET_FIELDS.forEach(function (k) {
+      CFG[k] = (typeof def[k] === "string") ? def[k] : "";
+    });
+    isiFormPengaturan();
+    $("#dash-sub").textContent = "Panel petugas — " + CFG.namaAcara;
+    showToast("Pengaturan dikembalikan ke bawaan.");
+  }
+
+  function setupTabs() {
+    $$("#dash-tabs .tab-btn").forEach(function (btn) {
+      btn.addEventListener("click", function () {
+        $$("#dash-tabs .tab-btn").forEach(function (b) { b.classList.remove("is-active"); });
+        btn.classList.add("is-active");
+        const tab = btn.getAttribute("data-tab");
+        $("#tab-data").classList.toggle("hidden", tab !== "data");
+        $("#tab-pengaturan").classList.toggle("hidden", tab !== "pengaturan");
+        if (tab === "pengaturan") isiFormPengaturan();
+      });
+    });
+
+    SET_FIELDS.forEach(function (k) {
+      const inp = document.getElementById("set-" + k);
+      if (inp) inp.addEventListener("input", updatePreview);
+    });
+    $("#btn-save-settings").addEventListener("click", simpanPengaturan);
+    $("#btn-reset-settings").addEventListener("click", resetPengaturan);
   }
 
   /* ---------- statistik ---------- */
@@ -458,6 +559,8 @@
   function init() {
     setupLogin();
     setupDash();
+    setupTabs();
+    isiFormPengaturan();
     showView(sessionStorage.getItem(AUTH_KEY) === "1" ? "dash" : "login");
     renderAll();
   }

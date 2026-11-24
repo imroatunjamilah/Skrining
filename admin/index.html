@@ -67,6 +67,15 @@
 
     <main class="dash-main">
 
+      <!-- navigasi tab -->
+      <nav class="tabs" id="dash-tabs" aria-label="Menu dashboard">
+        <button class="tab-btn is-active" data-tab="data" type="button">Data Peserta</button>
+        <button class="tab-btn" data-tab="pengaturan" type="button">Pengaturan Acara</button>
+      </nav>
+
+      <!-- ============ TAB 1: DATA PESERTA ============ -->
+      <div id="tab-data">
+
       <!-- statistik -->
       <div class="stat-grid">
         <div class="card stat-card">
@@ -160,6 +169,67 @@
         <b>akan disesuaikan dengan dokumen referensi resmi penyelenggara</b> begitu dokumen tersebut diterima.
         Seluruh konstanta terpusat di <code>js/scoring.js</code>. Hasil skrining bukan diagnosis.
       </p>
+
+      </div><!-- /tab-data -->
+
+      <!-- ============ TAB 2: PENGATURAN ACARA ============ -->
+      <section id="tab-pengaturan" class="hidden" aria-label="Pengaturan acara">
+        <div class="card set-card">
+          <h2 class="card-title">Pengaturan Acara</h2>
+          <p class="card-desc">Isi info acara di sini, lalu klik Simpan. Halaman peserta yang dibuka <b>di perangkat ini</b> langsung memakai pengaturan tersebut — tanpa perlu menyentuh kode.</p>
+
+          <div class="set-grid">
+            <div class="field set-field">
+              <label for="set-namaAcara">Nama acara</label>
+              <input class="input" id="set-namaAcara" type="text" placeholder="contoh: Skrining Kesehatan Mental 2026">
+            </div>
+            <div class="field set-field">
+              <label for="set-tanggalAcara">Tanggal acara</label>
+              <input class="input" id="set-tanggalAcara" type="text" placeholder="contoh: Senin, 24 November 2026">
+            </div>
+            <div class="field set-field">
+              <label for="set-lokasi">Lokasi</label>
+              <input class="input" id="set-lokasi" type="text" placeholder="contoh: Aula Gedung Student Center">
+            </div>
+            <div class="field set-field">
+              <label for="set-penyelenggara">Penyelenggara</label>
+              <input class="input" id="set-penyelenggara" type="text" placeholder="contoh: UPA Bimbingan dan Konseling">
+            </div>
+            <div class="field set-field">
+              <label for="set-kontak">Kontak petugas</label>
+              <input class="input" id="set-kontak" type="text" placeholder="contoh: Petugas di meja pendaftaran / WA 08xx">
+            </div>
+            <div class="field set-field">
+              <label for="set-durasiLabel">Durasi (tampil di landing)</label>
+              <input class="input" id="set-durasiLabel" type="text" placeholder="± 7 menit">
+            </div>
+            <div class="field set-field">
+              <label for="set-namaMaskot">Nama maskot</label>
+              <input class="input" id="set-namaMaskot" type="text" placeholder="Lumi">
+            </div>
+            <div class="field set-field">
+              <label for="set-prefixNomor">Awalan nomor registrasi</label>
+              <input class="input" id="set-prefixNomor" type="text" placeholder="SKR" maxlength="6">
+            </div>
+          </div>
+
+          <div class="set-preview">
+            <span class="set-preview-label">Pratinjau langsung — bagian atas halaman peserta</span>
+            <div class="set-preview-bar">
+              <span class="sp-brand"><span class="sp-logo" aria-hidden="true">SM</span><b id="pv-nama">-</b></span>
+              <span class="sp-chip" id="pv-chip">-</span>
+            </div>
+            <span class="sp-foot" id="pv-foot">-</span>
+          </div>
+
+          <div class="set-actions">
+            <button class="btn" id="btn-save-settings" type="button">Simpan Pengaturan</button>
+            <button class="btn btn-ghost" id="btn-reset-settings" type="button">Kembalikan Default</button>
+          </div>
+
+          <p class="card-foot"><b>Batasan mode demo:</b> pengaturan tersimpan di browser perangkat ini. HP peserta lain masih memakai pengaturan bawaan sampai (1) versi backend aktif, atau (2) pengaturan bawaan di <code>js/config.js</code> diperbarui di repo. Setelah backend aktif, pengaturan yang diisi di sini otomatis berlaku untuk semua perangkat.</p>
+        </div>
+      </section>
     </main>
   </section>
 
