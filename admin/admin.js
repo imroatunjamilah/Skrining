@@ -6,10 +6,9 @@
      melakukan autentikasi di server (hash password bcrypt,
      sesi JWT) dan seluruh perhitungan skor dijalankan ulang
      di backend. Lihat /server/README.md.
-   - Skor ditampilkan memakai metode standar DASS (Lovibond &
-     Lovibond, 1995). Bila dokumen referensi resmi penyelenggara
-     berbeda, cukup perbarui js/scoring.js — file ini otomatis
-     mengikuti.
+   - Skor ditampilkan memakai konstanta resmi dari dokumen referensi
+     penyelenggara ("DASS 21 Versi Indonesia UPA BK", hlm. 3) yang
+     sudah diterapkan di js/scoring.js — file ini otomatis mengikuti.
    ============================================================ */
 
 (function () {
@@ -270,9 +269,10 @@
       html += '<div class="keluhan-quote" style="opacity:.6">Peserta belum menyelesaikan seluruh butir, sehingga skor belum dihitung.</div>';
     }
 
-    html += '<p class="modal-note">Skor memakai metode standar DASS (Lovibond &amp; Lovibond, 1995); konstanta di ' +
-      '<code>js/scoring.js</code> dan akan disesuaikan dengan dokumen referensi resmi penyelenggara. ' +
-      'Hasil skrining adalah alat deteksi dini &mdash; <b>bukan diagnosis</b>. ' +
+    html += '<p class="modal-note">Skor dihitung persis dokumen referensi resmi penyelenggara ' +
+      '(<i>DASS 21 Versi Indonesia UPA BK</i>, hlm. 3): jumlah jawaban 7 butir per subskala &times;2, ' +
+      'lalu dicocokkan ke tabel ambang Normal/Ringan/Sedang/Berat/Sangat Berat. Konstanta terpusat di ' +
+      '<code>js/scoring.js</code>. Hasil skrining adalah alat deteksi dini &mdash; <b>bukan diagnosis</b>. ' +
       'Pada versi produksi, perhitungan dijalankan ulang di server dan analisis keluhan oleh LLM tersedia pada kolom khusus.</p>';
 
     $("#modal-body").innerHTML = html;
