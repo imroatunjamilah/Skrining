@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <meta name="theme-color" content="#7C3AED">
+  <meta name="description" content="Skrining kesehatan mental berbasis DASS-21 yang seru dan mudah, ditemani maskot Lumi. Privat, rahasia, dan bukan diagnosis.">
+  <title>Skrining Kesehatan Mental — Ayo Main Bareng Lumi!</title>
+  <link rel="icon" type="image/svg+xml" href="assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/screens.css">
+  <link rel="stylesheet" href="css/mascot.css">
+</head>
+<body data-screen="landing">
+
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob-1"></span>
+    <span class="blob-2"></span>
+    <span class="blob-3"></span>
+  </div>
+
+  <header class="topbar">
+    <div class="brand">
+      <span class="brand-logo" aria-hidden="true">SM</span>
+      <span id="brand-name">Skrining Mental</span>
+    </div>
+    <span class="event-chip" id="event-chip">Acara hari ini</span>
+  </header>
+
+  <main id="app">
+
+    <!-- ============ LAYAR 1: LANDING ============ -->
+    <section id="screen-landing" class="screen is-active">
+      <div class="hero">
+        <span class="hero-chip anim"><span class="dot"></span> Skrining buka hari ini</span>
+
+        <h1 class="hero-title anim anim-d1">Ayo Kenali <span class="accent">Perasaanmu</span> Bareng Lumi!</h1>
+
+        <p class="hero-sub anim anim-d2">
+          Skrining kesehatan mental yang seru dan mudah — ditemani
+          <span id="mascot-name-sub">Lumi</span>, teman barumu hari ini.
+          Jawab 21 pertanyaan singkat, dan perjalananmu selesai dalam sekejap.
+        </p>
+
+        <div id="mascot-hero-slot" class="hero-mascot-slot anim anim-d3"></div>
+
+        <div class="info-grid anim anim-d4">
+          <div class="info-mini">
+            <div class="ico ico-purple" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg>
+            </div>
+            <b id="info-duration">± 7 menit</b>
+            <span>selesai dengan cepat</span>
+          </div>
+          <div class="info-mini">
+            <div class="ico ico-pink" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z"/></svg>
+            </div>
+            <b>Privat &amp; rahasia</b>
+            <span>datamu terjaga baik</span>
+          </div>
+          <div class="info-mini">
+            <div class="ico ico-mint" aria-hidden="true">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 21s-7.5-4.7-9.5-9.3C1.2 8.4 3.2 5 6.6 5c2 0 3.4 1.1 5.4 3.2C14 6.1 15.4 5 17.4 5c3.4 0 5.4 3.4 4.1 6.7C19.5 16.3 12 21 12 21z"/></svg>
+            </div>
+            <b>Bukan diagnosis</b>
+            <span>dibaca profesional</span>
+          </div>
+        </div>
+
+        <div class="card consent-card anim anim-d5">
+          <h3>Kenapa kegiatan ini penting?</h3>
+          <p>
+            Skrining ini membantu tim penyelenggara memahami kondisi kesehatan mental
+            peserta secara umum, sehingga bisa menawarkan dukungan yang tepat.
+            Jawabanmu bersifat rahasia dan hanya dibaca oleh petugas berwenang.
+            Hasil skrining <strong>bukan diagnosis</strong> dan tidak menggantikan
+            konsultasi dengan profesional. Kamu bebas berhenti di tengah jalan, kapan saja.
+          </p>
+          <label class="check-row mt-14">
+            <input type="checkbox" id="consent-check">
+            <span class="check-box" aria-hidden="true">
+              <svg viewBox="0 0 24 24"><path d="M4 12.5l5 5L20 6.5"/></svg>
+            </span>
+            <p>Saya sudah membaca penjelasan di atas dan bersedia mengikuti skrining.</p>
+          </label>
+        </div>
+
+        <div class="landing-cta anim anim-d5">
+          <button id="btn-start" class="btn btn-pulse" type="button" disabled>Mulai Skrining</button>
+        </div>
+
+        <div id="resume-card" class="resume-card hidden">
+          <b>Lanjutkan perjalananmu?</b>
+          <p id="resume-text">Kamu punya skrining yang belum selesai di perangkat ini.</p>
+          <div class="btn-row" style="margin-top: 10px;">
+            <button id="btn-discard" class="btn btn-ghost" type="button">Mulai dari awal</button>
+            <button id="btn-resume" class="btn" type="button">Lanjutkan</button>
+          </div>
+        </div>
+
+        <div class="steps-toggle">
+          <button id="btn-steps" type="button">Bagaimana cara kerjanya?</button>
+        </div>
+
+        <div id="steps" class="steps hidden">
+          <div class="step-item">
+            <div class="num">1</div>
+            <b>Kenalan dulu</b>
+            <span>Isi nama dan data dirimu supaya hasilnya tercatat rapi.</span>
+          </div>
+          <div class="step-item">
+            <div class="num">2</div>
+            <b>Ceritain perasaanmu</b>
+            <span>Tulis bebas apa yang kamu rasakan akhir-akhir ini.</span>
+          </div>
+          <div class="step-item">
+            <div class="num">3</div>
+            <b>Main 21 pertanyaan</b>
+            <span>Jawab santai satu per satu — tidak ada jawaban salah.</span>
+          </div>
+          <div class="step-item">
+            <div class="num">4</div>
+            <b>Dapat nomor unik</b>
+            <span>Simpankan nomor registrasimu sebagai bukti ikut skrining.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAYAR 2: IDENTITAS ============ -->
+    <section id="screen-identitas" class="screen">
+      <div class="stage-head">
+        <span class="eyebrow">Langkah 1 dari 3</span>
+        <h2 class="section-title">Kenalan dulu, yuk!</h2>
+        <p class="section-sub">Lumi pengin tahu siapa teman barunya. Data ini menjaga keaslian hasil skrimu.</p>
+      </div>
+
+      <form id="form-identitas" class="card" novalidate>
+        <div class="field" id="field-nama">
+          <label for="inp-nama">Nama lengkap</label>
+          <input class="input" id="inp-nama" name="nama" type="text" autocomplete="name" placeholder="Tulis namamu di sini">
+          <span class="field-error-msg" id="err-nama">Nama minimal 3 huruf, ya.</span>
+        </div>
+
+        <div class="field" id="field-alamat">
+          <label for="inp-alamat">Alamat domisili</label>
+          <input class="input" id="inp-alamat" name="alamat" type="text" autocomplete="street-address" placeholder="Contoh: Jl. Melati No. 10, Yogyakarta">
+          <span class="field-error-msg" id="err-alamat">Alamat terlalu pendek — tulis yang lebih jelas, ya.</span>
+        </div>
+
+        <div class="field" id="field-hp">
+          <label for="inp-hp">Nomor HP / WhatsApp</label>
+          <input class="input" id="inp-hp" name="noHp" type="tel" inputmode="numeric" autocomplete="tel" placeholder="081234567890">
+          <span class="field-error-msg" id="err-hp">Nomor HP tidak valid. Contoh: 081234567890.</span>
+        </div>
+
+        <div class="field" id="field-kategori">
+          <label>Saya adalah</label>
+          <div class="kategori-grid" role="radiogroup" aria-label="Kategori peserta">
+            <label class="kategori-opt">
+              <input type="radio" name="kategori" value="Mahasiswa">
+              <span><span class="k-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 9l10-4 10 4-10 4z"/><path d="M6 11.5V16c0 1.5 3 2.5 6 2.5s6-1 6-2.5v-4.5"/></svg></span>Mahasiswa</span>
+            </label>
+            <label class="kategori-opt">
+              <input type="radio" name="kategori" value="Dosen">
+              <span><span class="k-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DB2777" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="7" width="18" height="13" rx="2.5"/><path d="M9 7V5.5A1.5 1.5 0 0 1 10.5 4h3A1.5 1.5 0 0 1 15 5.5V7"/><path d="M3 12.5h18"/></svg></span>Dosen</span>
+            </label>
+            <label class="kategori-opt">
+              <input type="radio" name="kategori" value="Umum">
+              <span><span class="k-ico" aria-hidden="true"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#059669" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3.5 19c.6-3.2 2.9-5 5.5-5s4.9 1.8 5.5 5"/><circle cx="17" cy="9" r="2.6"/><path d="M16 14.2c2.3.2 4 1.7 4.5 4.3"/></svg></span>Umum</span>
+            </label>
+          </div>
+          <span class="field-error-msg" id="err-kategori">Pilih salah satu kategori dulu, ya.</span>
+        </div>
+
+        <div class="field hidden" id="field-nim">
+          <label for="inp-nim">Nomor Induk Mahasiswa (NIM)</label>
+          <input class="input" id="inp-nim" name="nim" type="text" inputmode="numeric" placeholder="Contoh: 2210510001">
+          <span class="field-error-msg" id="err-nim">NIM hanya berupa angka (6-15 digit).</span>
+        </div>
+
+        <div class="field hidden" id="field-nip">
+          <label for="inp-nip">Nomor Induk Pegawai (NIP)</label>
+          <input class="input" id="inp-nip" name="nip" type="text" inputmode="numeric" placeholder="Contoh: 198705022010011003">
+          <span class="field-error-msg" id="err-nip">NIP hanya berupa angka (15-18 digit).</span>
+        </div>
+
+        <div class="btn-row">
+          <button class="btn" type="submit" id="btn-identitas-next">Lanjut Cerita</button>
+        </div>
+      </form>
+    </section>
+
+    <!-- ============ LAYAR 3: CERITA ============ -->
+    <section id="screen-cerita" class="screen">
+      <div class="stage-head">
+        <span class="eyebrow">Langkah 2 dari 3</span>
+        <h2 class="section-title">Apa yang sedang kamu rasakan akhir-akhir ini?</h2>
+        <p class="section-sub">Tulis bebas dengan kata-katamu sendiri. Tidak ada jawaban benar atau salah — Lumi akan mendengarkan dengan baik.</p>
+      </div>
+
+      <div class="card">
+        <textarea class="input" id="inp-story" maxlength="1000"
+          placeholder="Contoh: Akhir-akhir ini aku mudah lelah dan sulit tidur di malam hari..."></textarea>
+        <div class="char-counter"><span id="story-count">0</span>/1000 karakter</div>
+
+        <div class="chips" id="story-chips">
+          <span class="chips-label">Butuh ide awal? Sentuh salah satu:</span>
+          <button type="button" class="chip">Akhir-akhir ini aku mudah lelah</button>
+          <button type="button" class="chip">Aku susah tidur di malam hari</button>
+          <button type="button" class="chip">Tugas dan pekerjaan bikin aku cemas</button>
+          <button type="button" class="chip">Aku gampang marah ke orang terdekat</button>
+          <button type="button" class="chip">Aku merasa tidak semangat apa-apa</button>
+          <button type="button" class="chip">Aku kangen keluarga di rumah</button>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-story-skip" class="btn btn-ghost" type="button">Lewati</button>
+          <button id="btn-story-next" class="btn" type="button">Lanjut Main</button>
+        </div>
+        <p class="hint-noselect">Ceritamu boleh kosong — pilih "Lewati" kalau belum ingin bercerita.</p>
+      </div>
+    </section>
+
+    <!-- ============ LAYAR 4: KUIS DASS-21 ============ -->
+    <section id="screen-kuis" class="screen">
+      <div class="quiz-top">
+        <span class="quiz-count" id="quiz-count">Pertanyaan 1 dari 21</span>
+        <span class="quiz-week-chip">Minggu lalu</span>
+      </div>
+      <div class="progress-track" aria-hidden="true">
+        <div class="progress-fill" id="quiz-progress"></div>
+      </div>
+      <div class="chapter-dots" id="chapter-dots" aria-hidden="true">
+        <i></i><i></i><i></i>
+      </div>
+
+      <div class="card q-card">
+        <div id="q-swap">
+          <span class="q-num-badge" id="q-badge">Butir 1</span>
+          <p class="q-text" id="q-text">Memuat pertanyaan...</p>
+        </div>
+        <div class="options" id="q-options" role="radiogroup" aria-label="Pilihan jawaban"></div>
+        <div class="quiz-nav">
+          <button id="btn-back" class="btn btn-ghost btn-back" type="button">Kembali</button>
+          <button id="btn-next" class="btn" type="button" disabled>Lanjut</button>
+        </div>
+        <p class="hint-noselect">Pilih dulu jawabanmu — tombol Lanjut akan menyala sendiri.</p>
+      </div>
+
+      <div class="quiz-splash" id="quiz-splash" role="dialog" aria-modal="true" aria-labelledby="splash-title">
+        <div class="splash-card">
+          <span class="splash-badge" id="splash-badge">Bagian 2 dari 3</span>
+          <h3 class="splash-title" id="splash-title">Kamu Hebat!</h3>
+          <p class="splash-sub" id="splash-sub">7 pertanyaan pertama sudah beres.</p>
+          <div class="splash-slot" id="mascot-splash-slot"></div>
+          <button id="btn-splash-continue" class="btn" type="button">Lanjutkan</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ LAYAR 5: SELESAI ============ -->
+    <section id="screen-selesai" class="screen">
+      <div class="done-hero">
+        <div class="done-mascot-slot" id="mascot-done-slot"></div>
+        <h2 class="done-title">Yeay! Kamu Berhasil!</h2>
+        <p class="done-sub" id="done-sub">Terima kasih sudah meluangkan waktu. Langkah kecil hari ini adalah bentuk kepedulian yang besar terhadap dirimu sendiri.</p>
+
+        <div class="reg-card">
+          <span class="reg-label">Nomor Registrasimu</span>
+          <div class="reg-number" id="reg-number">SKR-00000000-000</div>
+          <button class="copy-btn" id="btn-copy" type="button">Salin Nomor</button>
+          <p class="reg-note">Simpan atau tunjukkan nomor ini kepada petugas bila diminta. Seluruh jawabanmu tersimpan rahasia.</p>
+        </div>
+
+        <div class="done-meta">
+          <span class="meta-pill" id="meta-duration">Durasi: -</span>
+          <span class="meta-pill">21 pertanyaan</span>
+          <span class="meta-pill" id="meta-date">-</span>
+        </div>
+
+        <div class="card done-next">
+          <h3>Apa yang terjadi selanjutnya?</h3>
+          <ul>
+            <li><span class="tick">1</span>Hasil skrimu diolah oleh tim profesional secara rahasia.</li>
+            <li><span class="tick">2</span>Skor dan catatanmu hanya bisa diakses petugas berwenang, tidak pernah ditampilkan di layar ini.</li>
+            <li><span class="tick">3</span>Kalau kamu ingin berbicara lebih lanjut, petugas di lokasi siap membantu mengarahkanmu ke layanan konseling.</li>
+            <li><span class="tick">4</span>Ingat ya: skrining ini bukan diagnosis. Pendampingan profesional tetap yang paling utama.</li>
+          </ul>
+        </div>
+
+        <div class="btn-row">
+          <button id="btn-finish" class="btn" type="button">Selesai</button>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Maskot pendamping: muncul di semua layar kecuali landing -->
+  <div id="mascot-companion-slot" aria-hidden="true"></div>
+
+  <footer class="footer-note">
+    <p><strong id="footer-organizer">Tim Skrining Kesehatan Mental</strong></p>
+    <p id="footer-kontak">Bingung? Panggil petugas di lokasi, ya.</p>
+    <p>Skrining ini bersifat pencegahan dan edukasi. Hasilnya bukan diagnosis dan tidak menggantikan pemeriksaan oleh profesional kesehatan mental.</p>
+    <span class="demo-tag">MODE DEMO — data tersimpan lokal di perangkat ini</span>
+    <p class="mt-8"><a class="link-admin" href="admin/">Login Petugas / Admin</a></p>
+  </footer>
+
+  <script src="js/config.js"></script>
+  <script src="js/questions.js"></script>
+  <script src="js/scoring.js"></script>
+  <script src="js/mascot.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

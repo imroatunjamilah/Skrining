@@ -1,0 +1,13 @@
+# sistem
+.DS_Store
+Thumbs.db
+*.log
+
+# editor
+.vscode/
+.idea/
+
+# dependencies (untuk backend yang akan datang)
+node_modules/
+__pycache__/
+.env

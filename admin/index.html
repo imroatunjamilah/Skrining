@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="theme-color" content="#5B21B6">
+  <title>Admin — Skrining Kesehatan Mental</title>
+  <link rel="icon" type="image/svg+xml" href="../assets/favicon.svg">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fredoka:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="../css/base.css">
+  <link rel="stylesheet" href="admin.css">
+</head>
+<body data-page="admin">
+
+  <div class="bg-blobs" aria-hidden="true">
+    <span class="blob-1"></span>
+    <span class="blob-2"></span>
+  </div>
+
+  <!-- ============ LOGIN ============ -->
+  <section id="view-login" class="view">
+    <div class="login-wrap">
+      <div class="card login-card">
+        <div class="login-head">
+          <span class="brand-logo" aria-hidden="true">SM</span>
+          <h1 class="section-title">Login Petugas</h1>
+          <p class="section-sub">Masuk untuk melihat data skrining dan hasil perhitungan.</p>
+        </div>
+        <form id="form-login" novalidate>
+          <div class="field" id="field-user">
+            <label for="inp-user">Username</label>
+            <input class="input" id="inp-user" type="text" autocomplete="username" placeholder="admin">
+          </div>
+          <div class="field" id="field-pass">
+            <label for="inp-pass">Password</label>
+            <input class="input" id="inp-pass" type="password" autocomplete="current-password" placeholder="Password">
+          </div>
+          <p class="login-err hidden" id="login-err">Username atau password salah.</p>
+          <button class="btn" type="submit">Masuk Dashboard</button>
+        </form>
+        <div class="demo-cred">
+          <b>Kredensial demo:</b> username <code>admin</code> &middot; password <code>skrining2026</code>
+          <span>Hanya untuk mode demo. Pada versi produksi, autentikasi dilakukan di server.</span>
+        </div>
+        <p class="back-link"><a class="link-admin" href="../">&larr; Kembali ke halaman peserta</a></p>
+      </div>
+    </div>
+  </section>
+
+  <!-- ============ DASHBOARD ============ -->
+  <section id="view-dash" class="view hidden">
+    <header class="dash-topbar">
+      <div>
+        <h1 class="dash-title">Dashboard Skrining</h1>
+        <p class="dash-sub" id="dash-sub">Panel petugas — data peserta dan hasil DASS-21</p>
+      </div>
+      <div class="dash-actions">
+        <button class="btn btn-ghost btn-sm" id="btn-logout" type="button">Keluar</button>
+      </div>
+    </header>
+
+    <div class="demo-banner">
+      MODE DEMO &mdash; data disimpan di localStorage perangkat ini. Versi produksi terhubung ke database (lihat /server/README.md).
+    </div>
+
+    <main class="dash-main">
+
+      <!-- statistik -->
+      <div class="stat-grid">
+        <div class="card stat-card">
+          <span class="stat-label">Total Peserta</span>
+          <span class="stat-value" id="stat-total">0</span>
+          <span class="stat-foot" id="stat-total-foot">terdaftar hari ini</span>
+        </div>
+        <div class="card stat-card stat-ok">
+          <span class="stat-label">Selesai</span>
+          <span class="stat-value" id="stat-done">0</span>
+          <span class="stat-foot" id="stat-done-foot">0% dari total</span>
+        </div>
+        <div class="card stat-card stat-warn">
+          <span class="stat-label">Belum Selesai</span>
+          <span class="stat-value" id="stat-wip">0</span>
+          <span class="stat-foot" id="stat-wip-foot">sedang mengisi</span>
+        </div>
+      </div>
+
+      <div class="dash-cols">
+        <!-- distribusi kategori -->
+        <div class="card">
+          <h2 class="card-title">Distribusi Kategori</h2>
+          <div class="bars" id="bars-kategori"></div>
+        </div>
+
+        <!-- alat ekspor -->
+        <div class="card">
+          <h2 class="card-title">Ekspor &amp; Data</h2>
+          <p class="card-desc">CSV memuat satu baris per peserta: identitas, 21 jawaban, skor D/A/S, dan ruang analisis keluhan.</p>
+          <div class="export-btns">
+            <button class="btn" id="btn-export-csv" type="button">Unduh CSV</button>
+            <button class="btn btn-soft" id="btn-seed" type="button">Isi Data Demo</button>
+            <button class="btn btn-ghost" id="btn-clear" type="button">Hapus Semua Data</button>
+          </div>
+          <p class="card-foot">PDF individual tersedia setelah backend aktif (butuh server untuk generate). Karena itu tombol PDF pada tabel sengaja dinonaktifkan di mode demo.</p>
+        </div>
+      </div>
+
+      <!-- tabel peserta -->
+      <div class="card table-card">
+        <div class="table-toolbar">
+          <h2 class="card-title">Daftar Peserta</h2>
+          <div class="filters">
+            <input class="input filter-search" id="flt-search" type="search" placeholder="Cari nama / NIM / NIP / HP / no. registrasi">
+            <select class="input filter-sel" id="flt-status" aria-label="Filter status">
+              <option value="">Semua status</option>
+              <option value="selesai">Selesai</option>
+              <option value="belum">Belum selesai</option>
+            </select>
+            <select class="input filter-sel" id="flt-kategori" aria-label="Filter kategori">
+              <option value="">Semua kategori</option>
+              <option value="Mahasiswa">Mahasiswa</option>
+              <option value="Dosen">Dosen</option>
+              <option value="Umum">Umum</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="table-scroll">
+          <table id="tbl-peserta">
+            <thead>
+              <tr>
+                <th class="th-no">No</th>
+                <th class="th-sort" data-sort="nama">Nama</th>
+                <th>NIM / NIP</th>
+                <th>Kategori</th>
+                <th>No. HP</th>
+                <th class="th-sort" data-sort="waktu">Waktu</th>
+                <th>Status</th>
+                <th class="th-aksi">Aksi</th>
+              </tr>
+            </thead>
+            <tbody id="tbl-body"></tbody>
+          </table>
+          <div class="empty-state hidden" id="tbl-empty">
+            <b>Belum ada data peserta</b>
+            <span>Klik "Isi Data Demo" di atas untuk melihat contoh tampilan, atau buka halaman peserta dan selesaikan satu skrining.</span>
+          </div>
+        </div>
+
+        <div class="pager" id="pager">
+          <button class="btn btn-ghost btn-sm" id="pg-prev" type="button">&larr; Sebelumnya</button>
+          <span class="pg-info" id="pg-info">Halaman 1 dari 1</span>
+          <button class="btn btn-ghost btn-sm" id="pg-next" type="button">Berikutnya &rarr;</button>
+        </div>
+      </div>
+
+      <p class="dash-foot">
+        Catatan skoring: perhitungan memakai metode standar publikasi DASS (Lovibond &amp; Lovibond, 1995) dan
+        <b>akan disesuaikan dengan dokumen referensi resmi penyelenggara</b> begitu dokumen tersebut diterima.
+        Seluruh konstanta terpusat di <code>js/scoring.js</code>. Hasil skrining bukan diagnosis.
+      </p>
+    </main>
+  </section>
+
+  <!-- ============ MODAL DETAIL ============ -->
+  <div class="modal" id="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+    <div class="modal-backdrop" id="modal-close-bg"></div>
+    <div class="modal-card">
+      <header class="modal-head">
+        <div>
+          <h2 class="modal-title" id="modal-title">Detail Peserta</h2>
+          <span class="modal-reg" id="modal-reg">-</span>
+        </div>
+        <button class="modal-x" id="modal-close" type="button" aria-label="Tutup">&times;</button>
+      </header>
+      <div class="modal-body" id="modal-body"></div>
+      <footer class="modal-foot">
+        <button class="btn btn-ghost" id="btn-modal-pdf" type="button" disabled title="Butuh backend — tersedia pada versi produksi">Unduh PDF</button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="../js/config.js"></script>
+  <script src="../js/questions.js"></script>
+  <script src="../js/scoring.js"></script>
+  <script src="admin.js"></script>
+</body>
+</html>

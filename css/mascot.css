@@ -1,0 +1,352 @@
+/* ============================================================
+   GAYA MASKOT, BUBBLE DIALOG, DAN EFEK (CONFETTI)
+   ============================================================ */
+
+/* ---------- pembungkus maskot ---------- */
+
+.mascot-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  pointer-events: none;
+  user-select: none;
+}
+
+.mascot-stage {
+  position: relative;
+  line-height: 0;
+}
+
+.mascot-hero .mascot-stage {
+  width: min(62vw, 240px);
+}
+
+.mascot-companion {
+  position: fixed;
+  left: 14px;
+  bottom: 12px;
+  z-index: 60;
+  align-items: flex-start;
+  transition: transform 0.45s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.35s ease;
+}
+
+/* pendamping menyempit/muncul per layar:
+   - landing  : disembunyikan (sudah ada maskot hero besar)
+   - selesai  : disembunyikan (sudah ada maskot perayaan)
+   - lainnya  : selalu hadir mendampingi */
+body[data-screen="landing"] .mascot-companion,
+body[data-screen="selesai"] .mascot-companion {
+  opacity: 0;
+  transform: translateY(130%);
+  pointer-events: none;
+}
+
+.mascot-companion .mascot-stage {
+  width: clamp(96px, 24vw, 150px);
+}
+
+.m-svg {
+  width: 100%;
+  height: auto;
+  overflow: visible;
+  filter: drop-shadow(0 10px 18px rgba(76, 29, 149, 0.18));
+}
+
+/* cincin glow di belakang maskot (ajakan main) */
+.mascot-stage::before {
+  content: "";
+  position: absolute;
+  inset: -8%;
+  border-radius: 50%;
+  background: radial-gradient(closest-side, rgba(167, 139, 250, 0.28), rgba(167, 139, 250, 0) 72%);
+  animation: mGlow 3.2s ease-in-out infinite;
+  z-index: -1;
+}
+
+/* ---------- bubble dialog ---------- */
+
+.m-bubble {
+  position: relative;
+  max-width: 250px;
+  margin: 0 0 10px 6px;
+  padding: 12px 16px 12px 14px;
+  background: #ffffff;
+  border: 2px solid var(--purple-200);
+  border-radius: 18px 18px 18px 4px;
+  box-shadow: 0 10px 24px rgba(76, 29, 149, 0.16);
+  opacity: 0;
+  transform: translateY(8px) scale(0.92);
+  transform-origin: left bottom;
+  transition: opacity 0.28s ease, transform 0.28s cubic-bezier(0.34, 1.56, 0.64, 1);
+  pointer-events: none;
+}
+
+.m-bubble.is-show {
+  opacity: 1;
+  transform: translateY(0) scale(1);
+}
+
+.m-bubble::after {
+  content: "";
+  position: absolute;
+  left: -9px;
+  bottom: 10px;
+  width: 14px;
+  height: 14px;
+  background: #ffffff;
+  border-left: 2px solid var(--purple-200);
+  border-bottom: 2px solid var(--purple-200);
+  border-bottom-left-radius: 4px;
+  transform: rotate(45deg);
+}
+
+.m-bubble-name {
+  display: block;
+  font-family: var(--font-head);
+  font-weight: 600;
+  font-size: 0.72rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: var(--purple-600);
+  margin-bottom: 2px;
+}
+
+.m-bubble-text {
+  display: inline-block;
+  font-size: 0.92rem;
+  line-height: 1.45;
+  color: var(--ink);
+  font-weight: 500;
+}
+
+.m-bubble-text::after {
+  content: "";
+  display: inline-block;
+  width: 2px;
+  height: 1em;
+  margin-left: 2px;
+  background: var(--purple-500);
+  vertical-align: -0.15em;
+  animation: mCaret 0.7s step-end infinite;
+}
+
+.m-bubble.is-shown-full .m-bubble-text::after {
+  animation: none;
+  opacity: 0;
+}
+
+/* ---------- posisi & animasi bagian tubuh ---------- */
+
+.m-body {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  animation: mBreathe 3.4s ease-in-out infinite;
+}
+
+.m-root {
+  transform-box: fill-box;
+  transform-origin: 50% 90%;
+  animation: mFloat 4.6s ease-in-out infinite;
+}
+
+.m-eyes {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+  animation: mBlink 4.8s infinite;
+}
+
+.is-blink-now .m-eyes { animation: none; transform: scaleY(0.12); }
+
+.m-pupil { transition: transform 0.14s ease-out; }
+
+.m-leaf {
+  transform-box: fill-box;
+  transform-origin: 0% 100%;
+  animation: mLeafWiggle 3.8s ease-in-out infinite;
+}
+
+/* mulut: hanya satu yang tampil sesuai state */
+.m-mouth-open,
+.m-mouth-worried { opacity: 0; }
+.is-talk .m-mouth-open { opacity: 1; animation: mTalk 0.3s ease-in-out infinite alternate; }
+.is-talk .m-mouth-smile { opacity: 0; }
+.is-worried .m-mouth-worried { opacity: 1; }
+.is-worried .m-mouth-smile { opacity: 0; }
+.is-worried .m-brow { opacity: 0.85 !important; animation: mBrowUp 0.3s ease both; }
+
+.m-mouth-open {
+  transform-box: fill-box;
+  transform-origin: 50% 50%;
+}
+
+/* ---------- state: wave (melambai, mengajak main) ---------- */
+
+.m-arm-inner {
+  transform-box: fill-box;
+  transform-origin: 0% 0%;
+  transition: transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.is-wave .m-arm-r .m-arm-inner {
+  animation: mWave 1.1s ease-in-out infinite;
+}
+
+.is-wave .m-body { animation: mBreathe 3.4s ease-in-out infinite, mLean 1.1s ease-in-out infinite; }
+
+/* ---------- state: bounce (lompat gembira) ---------- */
+
+.is-bounce .m-root { animation: mBounce 0.62s cubic-bezier(0.36, 0.07, 0.19, 0.97) 2; }
+
+/* ---------- state: cheer (bersorak + bintang) ---------- */
+
+.is-cheer .m-arm-l .m-arm-inner { transform: rotate(-128deg); }
+.is-cheer .m-arm-r .m-arm-inner { transform: rotate(128deg); }
+.is-cheer .m-root { animation: mCheerJump 0.8s ease-in-out infinite; }
+
+.m-spark { opacity: 0; transform-box: fill-box; transform-origin: 50% 50%; }
+.is-cheer .m-spark { animation: mSparkPop 1.15s ease-in-out infinite; }
+.is-cheer .m-spark-2 { animation-delay: 0.15s; }
+.is-cheer .m-spark-3 { animation-delay: 0.3s; }
+.is-cheer .m-spark-4 { animation-delay: 0.45s; }
+
+/* ---------- state: worried ---------- */
+
+.is-worried .m-root { animation: mShake 0.5s ease-in-out 2; }
+.is-worried .m-arm-l .m-arm-inner { transform: rotate(26deg); }
+
+/* ---------- state: think ---------- */
+
+.is-think .m-pupil { transform: translate(-3px, -3.5px); }
+.is-think .m-arm-r .m-arm-inner { transform: rotate(-34deg); }
+.is-think .m-root { animation: mTilt 2.4s ease-in-out infinite; }
+
+/* ---------- keyframes ---------- */
+
+@keyframes mBreathe {
+  0%, 100% { transform: scaleY(1); }
+  50% { transform: scaleY(1.035); }
+}
+
+@keyframes mFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-7px); }
+}
+
+@keyframes mBlink {
+  0%, 91%, 100% { transform: scaleY(1); }
+  93.5% { transform: scaleY(0.1); }
+}
+
+@keyframes mWave {
+  0%, 100% { transform: rotate(10deg); }
+  50% { transform: rotate(-52deg); }
+}
+
+@keyframes mLean {
+  0%, 100% { transform: scaleY(1.035) rotate(0deg); }
+  50% { transform: scaleY(1.035) rotate(3.5deg); }
+}
+
+@keyframes mBounce {
+  0% { transform: translateY(0) scale(1, 1); }
+  28% { transform: translateY(-20px) scale(0.95, 1.07); }
+  55% { transform: translateY(0) scale(1.07, 0.93); }
+  72% { transform: translateY(-8px) scale(0.99, 1.02); }
+  100% { transform: translateY(0) scale(1, 1); }
+}
+
+@keyframes mCheerJump {
+  0%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-13px); }
+}
+
+@keyframes mSparkPop {
+  0%, 100% { opacity: 0; transform: scale(0.4) rotate(0deg); }
+  50% { opacity: 1; transform: scale(1.15) rotate(28deg); }
+}
+
+@keyframes mTalk {
+  0% { transform: scaleY(0.45); }
+  100% { transform: scaleY(1.12); }
+}
+
+@keyframes mShake {
+  0%, 100% { transform: translateX(0); }
+  25% { transform: translateX(-4px); }
+  50% { transform: translateX(4px); }
+  75% { transform: translateX(-3px); }
+}
+
+@keyframes mTilt {
+  0%, 100% { transform: rotate(0deg); }
+  50% { transform: rotate(-3.5deg); }
+}
+
+@keyframes mBrowUp {
+  from { transform: translateY(4px); opacity: 0; }
+  to { transform: translateY(0); opacity: 0.85; }
+}
+
+@keyframes mLeafWiggle {
+  0%, 100% { transform: rotate(-28deg) scale(1); }
+  50% { transform: rotate(-14deg) scale(1.06); }
+}
+
+@keyframes mGlow {
+  0%, 100% { transform: scale(0.94); opacity: 0.75; }
+  50% { transform: scale(1.05); opacity: 1; }
+}
+
+@keyframes mCaret {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0; }
+}
+
+/* ---------- confetti ---------- */
+
+#fx-layer {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 999;
+}
+
+.fx-confetti {
+  position: fixed;
+  width: 10px;
+  height: 13px;
+  border-radius: 2px;
+  animation: fxConfettiFall var(--dur, 1000ms) cubic-bezier(0.2, 0.6, 0.4, 1) var(--delay, 0ms) forwards;
+}
+
+@keyframes fxConfettiFall {
+  0% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  82% { opacity: 1; }
+  100% { transform: translate(var(--dx, 0px), 58vh) rotate(var(--rot, 360deg)); opacity: 0; }
+}
+
+/* ---------- layar kecil ---------- */
+
+@media (max-width: 480px) {
+  .m-bubble {
+    max-width: 190px;
+    font-size: 0.86rem;
+  }
+  .mascot-companion { left: 10px; bottom: 10px; }
+}
+
+/* ---------- hormati preferensi pengguna ---------- */
+
+@media (prefers-reduced-motion: reduce) {
+  .m-body, .m-root, .m-eyes, .m-leaf,
+  .is-wave .m-arm-r .m-arm-inner,
+  .is-bounce .m-root,
+  .is-cheer .m-root,
+  .is-worried .m-root,
+  .is-think .m-root,
+  .mascot-stage::before,
+  .fx-confetti {
+    animation: none !important;
+  }
+  .m-bubble { transition: none; }
+}
