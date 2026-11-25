@@ -375,6 +375,10 @@
       });
     });
 
+    $("#btn-identitas-back").addEventListener("click", function () {
+      showScreen("landing");
+    });
+
     $("#form-identitas").addEventListener("submit", function (e) {
       e.preventDefault();
       const data = validasiIdentitas();
@@ -417,6 +421,13 @@
       });
     });
 
+    $("#btn-story-back").addEventListener("click", function () {
+      state.story = uangTeks(ta.value);
+      simpanDraft();
+      updateRecordSebagian();
+      showScreen("identitas");
+    });
+
     $("#btn-story-skip").addEventListener("click", function () {
       state.story = "";
       simpanDraft();
@@ -446,6 +457,7 @@
   ];
 
   let splashJustShown = false;
+  let lastRec = null; // rekam terakhir yang selesai — dipakai tombol PDF bukti
 
   function bukaKuis() {
     splashJustShown = false;
@@ -513,7 +525,8 @@
       wrap.appendChild(btn);
     });
 
-    $("#btn-back").disabled = i === 0;
+    $("#btn-back").disabled = false;
+    $("#btn-back").textContent = i === 0 ? "Kembali ke Cerita" : "Kembali";
     $("#btn-next").textContent = i === 20 ? "Selesaikan" : "Lanjut";
     $("#btn-next").disabled = state.answers[i] === null;
   }
@@ -564,6 +577,9 @@
       state.idx -= 1;
       renderQuestion();
       simpanDraft();
+    } else {
+      // di pertanyaan pertama: kembali ke layar cerita (jawaban tetap tersimpan)
+      showScreen("cerita");
     }
   }
 
@@ -602,6 +618,7 @@
       saveRecords(recs);
     }
     saveDraft(null);
+    lastRec = rec || lastRec;
 
     // KIRIM KE SERVER (mode backend) — terjadi di belakang layar;
     // kalau internet gagal, data tetap aman di localStorage peserta.
@@ -669,6 +686,24 @@
       if (doneMascot) doneMascot.wave(1200);
     });
 
+    $("#btn-pdf-bukti").addEventListener("click", function () {
+      const rec = lastRec || {
+        regNumber: $("#reg-number").textContent,
+        nama: state.identity.nama,
+        kategori: state.identity.kategori,
+        nim: state.identity.nim,
+        nip: state.identity.nip,
+        completedAt: new Date().toISOString(),
+        durasiDetik: null,
+      };
+      try {
+        window.PdfHasil.bukti(rec, CFG);
+        if (doneMascot) doneMascot.cheer(1200);
+      } catch (e) {
+        window.alert((e && e.message) ? e.message : "Gagal membuat PDF. Periksa koneksi internet lalu coba lagi.");
+      }
+    });
+
     $("#btn-finish").addEventListener("click", function () {
       state.identity = { nama: "", alamat: "", noHp: "", kategori: "", nim: "", nip: "" };
       state.story = "";
@@ -682,6 +717,8 @@
       toggleFieldNimNip("");
       $("#inp-story").value = "";
       $("#story-count").textContent = "0";
+      lastRec = null;
+      if (companion) companion.say("Siap! Untuk teman berikutnya tinggal mulai lagi, ya!", { hold: 3000 });
       showScreen("landing");
     });
   }
@@ -696,6 +733,12 @@
     $("#info-duration").textContent = CFG.durasiLabel;
     $("#footer-organizer").textContent = CFG.penyelenggara + (lokasi ? " — " + lokasi : "");
     $("#footer-kontak").textContent = CFG.kontak;
+    const tag = $(".demo-tag");
+    if (tag) {
+      tag.textContent = (window.DB && window.DB.backend)
+        ? "TERHUBUNG DATABASE ACARA — data tersimpan aman di server"
+        : "MODE DEMO — data tersimpan lokal di perangkat ini";
+    }
     document.title = CFG.namaAcara + " — Ayo Main Bareng " + CFG.namaMaskot + "!";
   }
 
@@ -726,4 +769,11 @@
   } else {
     init();
   }
+
+  // Saat halaman dipulihkan dari cache browser (tombol kembali / buka
+  // ulang lewat riwayat), muat ulang agar peserta berikutnya SELALU
+  // mulai bersih dari landing — bukan melihat layar/data orang sebelumnya.
+  window.addEventListener("pageshow", function (e) {
+    if (e.persisted) window.location.reload();
+  });
 })();

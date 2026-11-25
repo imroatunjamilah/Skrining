@@ -441,7 +441,7 @@
           : '<span class="badge badge-wip">Belum selesai</span>') + '</td>' +
         '<td class="td-aksi"><div class="aksi-row">' +
         '  <button class="mini-btn" data-act="detail" data-id="' + r.id + '">Detail</button>' +
-        '  <button class="mini-btn" disabled title="Butuh backend — tersedia pada versi produksi">PDF</button>' +
+        '  <button class="mini-btn" data-act="pdf" data-id="' + r.id + '"' + (r.status === "selesai" ? '' : ' disabled title="Peserta belum menyelesaikan skrining"') + '>PDF</button>' +
         '  <button class="mini-btn danger" data-act="hapus" data-id="' + r.id + '">Hapus</button>' +
         '</div></td>';
       body.appendChild(tr);
@@ -460,6 +460,23 @@
       .replace(/"/g, "&quot;").replace(/'/g, "&#39;");
   }
 
+  /* ---------- unduh PDF lembar hasil ---------- */
+
+  let detailId = null; // id peserta yang sedang terbuka di modal detail
+
+  function unduhPdfLengkap(r) {
+    if (!window.PdfHasil) {
+      showToast("Modul PDF belum termuat — periksa koneksi internet lalu muat ulang halaman.");
+      return;
+    }
+    try {
+      window.PdfHasil.lengkap(r, CFG);
+      showToast("PDF hasil peserta dibuat — cek folder unduhan.");
+    } catch (e) {
+      showToast("Gagal membuat PDF: " + ((e && e.message) || e));
+    }
+  }
+
   /* ---------- modal detail ---------- */
 
   function labelJawaban(nilai) {
@@ -470,6 +487,7 @@
   function bukaDetail(id) {
     const r = records.filter(function (x) { return x.id === id; })[0];
     if (!r) return;
+    detailId = id;
 
     $("#modal-reg").textContent = (r.regNumber || "-") + " · " + (r.kategori || "-");
     $("#modal-title").textContent = r.nama || "Detail Peserta";
@@ -489,6 +507,21 @@
     html += r.keluhan
       ? '<div class="keluhan-quote">' + escapeHtml(r.keluhan) + "</div>"
       : '<div class="keluhan-quote" style="opacity:.6">Tidak menulis cerita.</div>';
+
+    if (r.keluhan && window.AnalisisKeluhan) {
+      const A = window.AnalisisKeluhan.analisis(r.keluhan, r.hasil);
+      const badgeTingkat = A.tingkat.level === 2 ? "sev-berat" : (A.tingkat.level === 1 ? "sev-sedang" : "sev-normal");
+      html += '<p class="sec-label">Analisis Keluhan (otomatis — dihitung di perangkat ini, cerita tidak dikirim ke layanan AI)</p>';
+      html += '<div class="analisis-box">';
+      html += '<div class="analisis-chips">' + A.tema.map(function (t) {
+        return '<span class="analisis-chip">' + escapeHtml(t) + '</span>';
+      }).join("") + '</div>';
+      html += '<div class="analisis-line"><b>Nuansa emosi:</b> ' + escapeHtml(A.emosi) + '</div>';
+      html += '<div class="analisis-line"><b>Ringkasan:</b> ' + escapeHtml(A.ringkasan) + '</div>';
+      html += '<div class="analisis-line"><b>Saran tindak lanjut:</b> ' + escapeHtml(A.saran) + '</div>';
+      html += '<div class="analisis-line"><span class="badge badge-sev ' + badgeTingkat + '">' + escapeHtml(A.tingkat.label) + '</span></div>';
+      html += '</div>';
+    }
 
     html += '<p class="sec-label">Jawaban DASS-21 (0=Tidak Terjadi &middot; 1=Jarang Terjadi &middot; 2=Sering Terjadi &middot; 3=Selalu Terjadi)</p>';
     html += '<div class="jawaban-list">';
@@ -526,9 +559,14 @@
       '(<i>DASS 21 Versi Indonesia UPA BK</i>, hlm. 3): jumlah jawaban 7 butir per subskala &times;2, ' +
       'lalu dicocokkan ke tabel ambang Normal/Ringan/Sedang/Berat/Sangat Berat. Konstanta terpusat di ' +
       '<code>js/scoring.js</code>. Hasil skrining adalah alat deteksi dini &mdash; <b>bukan diagnosis</b>. ' +
-      'Pada versi produksi, perhitungan dijalankan ulang di server dan analisis keluhan oleh LLM tersedia pada kolom khusus.</p>';
+      'Skor dihitung ulang dari jawaban mentah di sisi petugas, dan analisis keluhan dihitung otomatis di perangkat ini (tanpa layanan AI eksternal).</p>';
 
     $("#modal-body").innerHTML = html;
+    const btnPdfModal = $("#btn-modal-pdf");
+    if (btnPdfModal) {
+      btnPdfModal.disabled = (r.status !== "selesai");
+      btnPdfModal.title = r.status === "selesai" ? "Unduh lembar hasil peserta (PDF)" : "Peserta belum menyelesaikan skrining";
+    }
     $("#modal").classList.add("is-open");
   }
 
@@ -558,7 +596,7 @@
     ["Depresi", "Kecemasan", "Stress"].forEach(function (s) {
       head.push(s + " Mentah", s + " Final", s + " Kategori");
     });
-    // Ruang analisis keluhan (LLM) — terisi otomatis saat backend aktif
+    // Kolom analisis keluhan — dihitung otomatis di perangkat petugas
     ["Analisis Tema", "Analisis Emosi", "Analisis Ringkasan", "Analisis Saran Tindak Lanjut"].forEach(function (s) {
       head.push(s);
     });
@@ -585,8 +623,8 @@
         const h = r.hasil && r.hasil.perSubskala && r.hasil.perSubskala[sub];
         row.push(h ? h.mentah : "", h ? h.final : "", h ? h.kategori : "");
       });
-      // Kolom LLM: placeholder sampai backend analisis aktif
-      row.push("", "", "", "");
+      const A = (r.keluhan && window.AnalisisKeluhan) ? window.AnalisisKeluhan.analisis(r.keluhan, r.hasil) : null;
+      row.push(A ? A.tema.join(", ") : "", A ? A.emosi : "", A ? A.ringkasan : "", A ? A.saran : "");
       rows.push(row);
     });
 
@@ -677,6 +715,10 @@
       const act = btn.getAttribute("data-act");
       const id = btn.getAttribute("data-id");
       if (act === "detail") bukaDetail(id);
+      if (act === "pdf") {
+        const r2 = records.filter(function (x) { return x.id === id; })[0];
+        if (r2) unduhPdfLengkap(r2);
+      }
       if (act === "hapus") {
         const r = records.filter(function (x) { return x.id === id; })[0];
         if (r && window.confirm("Hapus data peserta \"" + (r.nama || id) + "\"?")) {
@@ -690,6 +732,12 @@
           }
         }
       }
+    });
+
+    $("#btn-modal-pdf").addEventListener("click", function () {
+      if (!detailId) return;
+      const r = records.filter(function (x) { return x.id === detailId; })[0];
+      if (r) unduhPdfLengkap(r);
     });
 
     $("#modal-close").addEventListener("click", tutupModal);
@@ -719,6 +767,40 @@
     }
   }
 
+  /* ---------- tema keluhan (analisis agregat) ---------- */
+
+  function renderTemaKeluhan() {
+    const box = $("#tema-list");
+    if (!box) return;
+    const A = window.AnalisisKeluhan ? window.AnalisisKeluhan.agregat(records) : null;
+    if (!A || !A.jumlah) {
+      box.innerHTML = '<div class="bar-row"><span class="bar-name" style="width:100%">Belum ada peserta yang menulis cerita/keluhan.</span></div>';
+      const f = $("#tema-foot");
+      if (f) f.textContent = "";
+      return;
+    }
+    const max = A.tema.length ? A.tema[0].jumlah : 1;
+    const warna = ["var(--purple-500)", "var(--pink-400)", "var(--mint-300)", "#8B5CF6", "#EC4899", "#10B981"];
+    box.innerHTML = A.tema.slice(0, 6).map(function (t, i) {
+      const pct = Math.max(4, Math.round(t.jumlah / max * 100));
+      return '<div class="bar-row">' +
+        '<span class="bar-name">' + escapeHtml(t.nama) + '</span>' +
+        '<div class="bar-track"><div class="bar-fill" style="width:0;background:' + warna[i % warna.length] + '" data-w="' + pct + '"></div></div>' +
+        '<span class="bar-val">' + t.jumlah + '</span>' +
+        '</div>';
+    }).join("");
+    window.requestAnimationFrame(function () {
+      box.querySelectorAll(".bar-fill").forEach(function (el) {
+        el.style.width = el.getAttribute("data-w") + "%";
+      });
+    });
+    const f = $("#tema-foot");
+    if (f) {
+      f.textContent = "Dihitung dari " + A.jumlah + " peserta yang menulis cerita" +
+        (A.prioritas ? " — " + A.prioritas + " berstatus PRIORITAS pendampingan." : ".");
+    }
+  }
+
   async function renderAll() {
     if (DB.backend) {
       try {
@@ -732,6 +814,7 @@
     }
     renderStats();
     renderTable();
+    renderTemaKeluhan();
   }
 
   async function init() {
