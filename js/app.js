@@ -739,7 +739,7 @@
         ? "TERHUBUNG DATABASE ACARA — data tersimpan aman di server"
         : "MODE DEMO — data tersimpan lokal di perangkat ini";
     }
-    document.title = CFG.namaAcara + " — Ayo Main Bareng " + CFG.namaMaskot + "!";
+    document.title = CFG.namaAcara + " — Mari Kenali Perasaan Bersama " + CFG.namaMaskot + "!";
   }
 
   function init() {
